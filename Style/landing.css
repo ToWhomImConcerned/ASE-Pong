@@ -1,0 +1,932 @@
+/* ============================================================
+   LANDING.CSS
+   ============================================================ */
+
+
+/* ---- PAGE LAYOUT ----------------------------------------- */
+
+.landing-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  width: 100%;
+  padding: 80px 20px 40px;
+}
+
+/* ---- TITLE ----------------------------------------------- */
+
+.landing-title-block {
+  text-align: center;
+  margin-bottom: 80px;
+  transition: opacity 0.6s ease;
+}
+
+.landing-title-block.title-dimmed {
+  opacity: 0.08;
+}
+
+.landing-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 900;
+  letter-spacing: 16px;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+}
+
+.landing-subtitle {
+  font-size: 14px;
+  letter-spacing: 5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+
+/* ---- CARDS CONTAINER ------------------------------------- */
+
+.cards-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 640px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+/* ---- NODE CANVAS ----------------------------------------- */
+
+#node-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.cards-container.cards-hovered #node-canvas {
+  opacity: 1;
+}
+
+
+/* ---- LED BORDER CANVAS ----------------------------------- */
+/*
+  Sits as first child inside each card, positioned to exactly
+  cover the card + 1px outset so the glow pass bleeds slightly
+  beyond the card edge. pointer-events: none passes clicks through.
+  z-index: 2 puts it above the card bg, below text content.
+  overflow: visible on the parent card lets the glow bleed out.
+*/
+
+.card-border-canvas {
+  position: absolute;
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  pointer-events: none;
+  z-index: 2;
+  border-radius: inherit;
+}
+
+
+/* ---- MODE CARD BASE -------------------------------------- */
+
+.mode-card {
+  position: relative;
+  width: 100%;
+  padding: 36px 40px;
+  border: 1px solid var(--color-border-dim);
+  background: var(--color-bg-surface);
+  cursor: crosshair;
+  z-index: 1;
+  overflow: visible;   /* allow LED glow to bleed outside card edge */
+  transition:
+    transform      0.5s cubic-bezier(0.23, 1, 0.32, 1),
+    border-color   0.4s ease,
+    background     0.4s ease,
+    opacity        0.4s ease;
+}
+
+/* Card content needs its own stacking context so text
+   renders above the border canvas (z-index: 2) */
+.mode-card > *:not(.card-border-canvas) {
+  position: relative;
+  z-index: 4;
+}
+
+.card-classic {
+  border-radius: 4px 4px 0 0;
+}
+
+.card-adaptive {
+  border-radius: 0 0 4px 4px;
+}
+
+
+/* ---- CARD SPLIT ON HOVER --------------------------------- */
+
+.cards-container.cards-hovered .card-classic {
+  transform: translateX(-32px);
+}
+
+.cards-container.cards-hovered .card-adaptive {
+  transform: translateX(32px);
+}
+
+.cards-container.hover-classic .card-adaptive {
+  opacity: 0.35;
+}
+
+.cards-container.hover-adaptive .card-classic {
+  opacity: 0.35;
+}
+
+
+/* ---- CARD COLORS ON HOVER -------------------------------- */
+
+.cards-container.hover-classic .card-classic {
+  border-color: transparent;   /* LED canvas replaces the static border */
+  background: #0a0f14;
+}
+
+.cards-container.hover-adaptive .card-adaptive {
+  border-color: transparent;
+  background: #120a07;
+}
+
+
+/* ---- CARD TYPOGRAPHY ------------------------------------- */
+
+.card-mode-label {
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.card-mode-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(24px, 2.5vw, 22px);
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: var(--color-text-primary);
+  transition: color 0.4s ease;
+}
+
+.card-mode-desc {
+  font-size: 16px;
+  line-height: 2.0;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+
+/* ---- CLASSIC CARD COLORS --------------------------------- */
+
+.card-classic .card-mode-label {
+  color: var(--color-classic-secondary);
+}
+
+.cards-container.hover-classic .card-classic .card-mode-name {
+  color: var(--color-classic-primary);
+}
+
+
+/* ---- ADAPTIVE CARD COLORS -------------------------------- */
+
+.card-adaptive .card-mode-label {
+  color: var(--color-adaptive-secondary);
+}
+
+.cards-container.hover-adaptive .card-adaptive .card-mode-name {
+  color: var(--color-adaptive-primary);
+}
+
+
+/* ---- OR DIVIDER ------------------------------------------ */
+
+.or-divider {
+  font-size: 14px;
+  letter-spacing: 6px;
+  color: var(--color-text-muted);
+  padding: 24px 0;
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.4s ease;
+}
+
+.cards-container.cards-hovered .or-divider {
+  opacity: 0;
+}
+
+
+/* ---- FADE IN ON LOAD ------------------------------------- */
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity   0.7s ease,
+    transform 0.7s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   OVERLAY SYSTEM
+   ============================================================ */
+
+/* ---- PAGE EXIT ANIMATION --------------------------------- */
+
+@keyframes pageExitUp {
+  0%   { opacity: 1;    transform: translateY(0); }
+  100% { opacity: 0;    transform: translateY(-60px); }
+}
+
+.page-content.exiting {
+  animation: pageExitUp 0.55s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  pointer-events: none;
+}
+
+.page-content.hidden {
+  display: none;
+}
+
+
+/* ---- DIM LAYER ------------------------------------------- */
+
+#dim-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(4, 4, 12, 0.82);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+#dim-layer.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ---- OVERLAY CONTAINER ----------------------------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@keyframes overlayEnter {
+  0%   { opacity: 0; transform: translateY(-40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes overlayExit {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+
+.overlay.entering {
+  animation: overlayEnter 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  pointer-events: auto;
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.overlay.exiting {
+  animation: overlayExit 0.4s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  pointer-events: none;
+}
+
+/* ============================================================
+   ADAPTIVE TERMINAL OVERLAY
+   ============================================================ */
+
+.overlay-adaptive {
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 48px;
+}
+
+.overlay-terminal {
+  position: relative;
+  width: fit-content;
+  min-width: 720px;
+  max-width: 820px;
+  min-height: 140px;
+  max-height: 78vh;
+  height: auto;
+  margin: auto;
+  background:
+    linear-gradient(135deg, rgba(255,42,20,0.06), transparent 42%),
+    #05050a;
+  border: 1px solid var(--color-adaptive-secondary);
+  box-shadow:
+    0 0 38px rgba(255,176,0,0.18),
+    0 0 110px rgba(255,42,20,0.12),
+    inset 0 0 42px rgba(255,42,20,0.06);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition:
+    height 0.35s ease,
+    min-height 0.35s ease;
+}
+
+/* subtle scanline texture */
+
+.overlay-terminal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.00) 0px,
+      rgba(255,255,255,0.00) 2px,
+      rgba(255,180,120,0.018) 3px,
+      rgba(255,180,120,0.025) 4px
+    );
+  opacity: 0.45;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* ---- TERMINAL HEADER ------------------------------------ */
+
+.terminal-header {
+  margin-bottom: 22px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,176,0,0.18);
+  color: #a86f34;
+  font-size: 10px;
+  letter-spacing: 6px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ---- PANEL ----------------------------------------------- */
+
+.overlay-panel {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 48px 52px;
+  background: var(--color-bg-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-radius: 4px;
+  /* border added per-variant below */
+}
+
+.overlay-panel-classic {
+  border: 1px solid var(--color-classic-secondary);
+  box-shadow:
+    0 0 40px #00cfff18,
+    0 0 80px #00ff8810,
+    inset 0 0 30px #00cfff06;
+}
+
+.overlay-panel-adaptive {
+  border: 1px solid var(--color-adaptive-secondary);
+  box-shadow:
+    0 0 40px rgba(255,176,0,0.18),
+    0 0 80px rgba(255,42,20,0.14),
+    inset 0 0 30px rgba(255,42,20,0.08);
+}
+
+
+/* ---- PANEL TYPOGRAPHY ------------------------------------ */
+
+.overlay-label {
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.overlay-panel-classic .overlay-label { color: var(--color-classic-secondary); }
+.overlay-panel-adaptive .overlay-label { color: var(--color-adaptive-secondary); }
+
+.overlay-title {
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.overlay-panel-classic .overlay-title { color: var(--color-classic-primary); }
+.overlay-panel-adaptive .overlay-title { color: var(--color-adaptive-primary); }
+
+.overlay-subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* ---- DIFFICULTY BUTTONS ---------------------------------- */
+
+.difficulty-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.diff-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: 1px solid var(--color-border-dim);
+  color: var(--color-text-primary);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  cursor: crosshair;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  transition:
+    border-color 0.3s ease,
+    background   0.3s ease,
+    box-shadow   0.3s ease;
+}
+
+.diff-btn:hover:not(:disabled) {
+  background: #0a0f14;
+}
+
+.diff-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.diff-init:hover      { border-color: #00ff0d; box-shadow: 0 0 16px #00ff0d30; }
+.diff-stable:hover    { border-color: #ffdd00; box-shadow: 0 0 16px #ffdd0030; }
+.diff-prime:hover     { border-color: #ff8800; box-shadow: 0 0 16px #ff880030; }
+.diff-overclock:hover { border-color: #ff2200; box-shadow: 0 0 16px #ff220030; }
+
+.diff-tag {
+  font-size: 16px;
+  letter-spacing: 3px;
+}
+
+.diff-init      .diff-tag { color: #00ff0d; }
+.diff-stable    .diff-tag { color: #ffdd00; }
+.diff-prime     .diff-tag { color: #ff8800; }
+.diff-overclock .diff-tag { color: #ff2200; }
+
+.diff-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+}
+
+/* ---- TERMINAL EXECUTE BUTTON ----------------------------- */
+
+.terminal-execute {
+  background: transparent;
+  border: none;
+  color: var(--color-adaptive-primary);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  cursor: crosshair;
+  transition:
+    opacity 0.3s ease,
+    color 0.3s ease;
+}
+
+.terminal-execute:hover:not(:disabled) {
+  color: #ffd089;
+}
+
+.terminal-execute:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* ---- TERMINAL ABORT -------------------------------------- */
+
+.terminal-abort {
+  margin-top: 18px;
+  align-self: flex-start;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  cursor: crosshair;
+  transition:
+    color 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.terminal-abort:hover {
+  color: var(--color-text-primary);
+}
+
+/* ---- BACK BUTTON ----------------------------------------- */
+
+.overlay-back {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  cursor: crosshair;
+  margin-top: 8px;
+  transition: color 0.2s ease;
+}
+
+.overlay-back:hover {
+  color: var(--color-text-primary);
+}
+
+
+/* ---- BOOT LOG (adaptive) --------------------------------- */
+
+.boot-log {
+  min-height: 60px;
+  max-height: 62vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 18px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.boot-line {
+  position: relative;
+  width: fit-content;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #b7bcc7;
+  opacity: 0;
+  animation: bootLineFade 0.3s ease forwards;
+  text-shadow:
+    0 0 4px rgba(255,255,255,0.03);
+}
+
+.boot-line.ok   { color: var(--color-adaptive-secondary); }
+.boot-line.warn { color: var(--color-adaptive-primary); }
+
+.boot-ghost {
+  opacity: 0.18;
+  margin-top: -18px;
+  margin-left: 4px;
+  pointer-events: none;
+}
+
+.boot-dead {
+  color: #ff4500;
+  opacity: 0.72;
+  text-shadow:
+    0 0 8px rgba(255,69,0,0.35);
+  letter-spacing: 2px;
+}
+
+@keyframes bootLineFade {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ---- OBSERVR TERMINAL STATES ----------------------------- */
+
+.boot-dim {
+  color: #7f8794;
+}
+
+.boot-bright {
+  color: #d8dde7;
+}
+
+.boot-warn {
+  color: #ffb347;
+}
+
+.boot-error {
+  color: #ff5a36;
+}
+
+.boot-ghost {
+  color: #5a3a32;
+  opacity: 0.4;
+}
+
+.boot-separator {
+  color: #40251c;
+  letter-spacing: 1px;
+}
+
+.boot-indent {
+  padding-left: 28px;
+}
+
+.boot-indent2 {
+  padding-left: 54px;
+}
+
+/* ---- TERMINAL ATMOSPHERE -------------------------------- */
+
+.boot-line {
+  position: relative;
+  width: fit-content;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 4px rgba(255,120,0,0.08);
+}
+
+/* corrupted offset lines */
+
+.boot-line:nth-child(3n) {
+  margin-left: 18px;
+}
+
+.boot-line:nth-child(5n) {
+  margin-left: 48px;
+}
+
+.boot-line:nth-child(7n) {
+  margin-left: 10px;
+}
+
+.boot-line:nth-child(9n) {
+  margin-left: 72px;
+}
+
+/* subtle brightness variance */
+
+.boot-line:nth-child(4n) {
+  opacity: 0.72;
+}
+
+.boot-line:nth-child(6n) {
+  opacity: 0.45;
+}
+
+/* ---- TERMINAL FOOTER ------------------------------------ */
+
+.terminal-footer {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  padding-top: 18px;
+  margin-top: 20px;
+
+  border-top: 1px solid #1a1a2e;
+}
+
+/* ---- PROGRESS BAR ---------------------------------------- */
+
+.terminal-progress-wrap {
+  flex: 1;
+  height: 2px;
+  background: #1a1a2e;
+  overflow: hidden;
+}
+
+.boot-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-adaptive-primary), var(--color-adaptive-secondary));
+  transition: width 0.4s ease;
+  box-shadow: 0 0 8px #ff450060;
+}
+
+/* ---- INLINE TERMINAL BARS ------------------------------- */
+
+.inline-bar-wrap {
+  display: inline-block;
+
+  width: 180px;
+  height: 6px;
+
+  background: #1b1310;
+
+  margin: 0 10px;
+
+  vertical-align: middle;
+
+  overflow: hidden;
+}
+
+.inline-bar-fill {
+  height: 100%;
+  width: 0%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ff5a36,
+      #ffb347
+    );
+
+  box-shadow:
+    0 0 8px rgba(255,90,54,0.35);
+}
+
+/* ---- ADAPTIVE BOOT TEXT ---------------------------------- */
+
+.boot-spacer {
+  height: 8px;
+  flex: 0 0 auto;
+}
+
+.boot-log {
+  gap: 7px;
+}
+
+.boot-line {
+  white-space: nowrap;
+}
+
+.boot-dim {
+  color: #858d9a;
+}
+
+.boot-bright {
+  color: #dce3ed;
+}
+
+.boot-neon {
+  color: #fff3d0;
+  text-shadow:
+    0 0 8px rgba(255,176,0,0.34),
+    0 0 18px rgba(255,42,20,0.18);
+}
+
+.boot-warn {
+  color: #ffb000;
+  text-shadow:
+    0 0 7px rgba(255,176,0,0.34);
+}
+
+.boot-error {
+  color: #ff3b22;
+  text-shadow:
+    0 0 7px rgba(255,42,20,0.42),
+    0 0 16px rgba(255,176,0,0.16);
+}
+
+.boot-glitch {
+  will-change: transform, filter, opacity;
+  animation:
+    bootLineFade 0.3s ease forwards,
+    subtleBootGlitch 1.15s steps(2, end) infinite;
+}
+
+.boot-stutter {
+  color: #6f4d45;
+  opacity: 0.56;
+  text-shadow:
+    0 0 6px rgba(255,42,20,0.16);
+}
+
+@keyframes subtleBootGlitch {
+  0%, 64%, 100% {
+    transform: translateX(0);
+    filter: none;
+    opacity: 1;
+  }
+  68% {
+    transform: translateX(1px);
+    filter: brightness(1.38);
+    opacity: 0.82;
+  }
+  72% {
+    transform: translateX(-1px);
+    filter: brightness(0.84);
+    opacity: 1;
+  }
+  76% {
+    transform: translateX(0);
+    filter: brightness(1.18);
+    opacity: 0.9;
+  }
+}
+
+/* ---- OVERLAY EXIT ANIMATION ------------------------------ */
+
+@keyframes pageEnterDown {
+  0%   { opacity: 0; transform: translateY(-60px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.page-content.page-entering {
+  animation: pageEnterDown 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+
+/* ============================================================
+   ROUNDS OVERLAY
+   Shares .overlay-panel-classic border/glow.
+   Label + title use classic-secondary (cyan #00cfff).
+   Button accent is classic-secondary (teal/cyan) on hover.
+   ============================================================ */
+
+/* Override label + title colors — panel border/glow inherited from -classic */
+.overlay-panel-rounds .overlay-label {
+  color: var(--color-classic-secondary);
+}
+
+.overlay-panel-rounds .overlay-title {
+  color: var(--color-classic-primary);
+}
+
+/* ---- ROUNDS OPTION LIST ---------------------------------- */
+
+.rounds-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* Base button — mirrors .diff-btn exactly */
+.rounds-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: 1px solid var(--color-border-dim);
+  color: var(--color-text-primary);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  cursor: crosshair;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  transition:
+    border-color 0.3s ease,
+    background   0.3s ease,
+    box-shadow   0.3s ease;
+}
+
+.rounds-btn:hover {
+  background: #070e14;
+  border-color: var(--color-classic-secondary);
+  box-shadow: 0 0 16px #00cfff28;
+}
+
+/* Tag line — always cyan, intensifies on hover */
+.rounds-tag {
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: var(--color-classic-primary);
+  transition: text-shadow 0.3s ease;
+}
+
+.rounds-btn:hover .rounds-tag {
+  text-shadow: 0 0 12px var(--color-classic-primary);
+}
+
+/* Description — matches .diff-desc */
+.rounds-desc {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  letter-spacing: 1px;
+}

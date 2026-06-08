@@ -91,7 +91,7 @@ function aiUpdate() {
 
       const rawTarget = aiTrajectoryCommitY - ai.h / 2;
       if (aiSmoothedTarget === null) aiSmoothedTarget = rawTarget;
-      aiSmoothedTarget += (rawTarget - aiSmoothedTarget) * 0.14;
+      aiSmoothedTarget += (rawTarget - aiSmoothedTarget) * 0.03;
       ai.targetY = aiSmoothedTarget;
 
       const gap = aiSmoothedTarget - ai.y;
@@ -104,7 +104,7 @@ function aiUpdate() {
     }
   }
 
-  const aiMargin = CONFIG.BALL_SIZE * 1.5;
+  const aiMargin = CONFIG.BALL_SIZE * 1.3;
   ai.y = Math.max(aiMargin, Math.min(H - ai.h - aiMargin, ai.y));
 }
 

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PONG // ADVERSARIAL SYSTEMS</title>
+  <link rel="stylesheet" href="style/base.css">
+  <link rel="stylesheet" href="style/game.css">
+</head>
+<body>
+
+  <div class="ambient-wrap"></div>
+
+  <!-- Shared dim layer -->
+  <div id="dim-layer"></div>
+
+  <!-- Settings overlay -->
+  <div class="overlay" id="overlay-settings" aria-hidden="true">
+    <div class="overlay-panel overlay-panel-settings">
+      <p class="overlay-label">\\ SYSTEM CONFIG //</p>
+      <h2 class="overlay-title">SETTINGS</h2>
+      <button class="settings-reset-btn" id="settings-reset">↺ RESET</button>
+
+      <div class="settings-rows">
+
+        <!-- PLAYER NAME — text input -->
+        <div class="settings-row">
+          <span class="settings-row-label">PLAYER NAME</span>
+          <div class="settings-name-wrap">
+            <input
+              type="text"
+              id="input-player-name"
+              class="settings-name-input"
+              maxlength="3"
+              placeholder="USR"
+              autocomplete="off"
+              spellcheck="false"
+            >
+          </div>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- PLAYER COLOR — color picker -->
+        <div class="settings-row">
+          <span class="settings-row-label">PLAYER COLOR</span>
+          <div class="settings-color-pick">
+            <input type="color" id="pick-player-color" value="#001aff">
+            <button class="settings-color-btn" id="btn-player-color">
+              <span id="val-player-color">#001AFF</span>
+              <span class="settings-dd-swatch" id="swatch-player" style="background:#001aff"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- BALL COLOR — color picker -->
+        <div class="settings-row">
+          <span class="settings-row-label">BALL COLOR</span>
+          <div class="settings-color-pick">
+            <input type="color" id="pick-ball-color" value="#e8e8e8">
+            <button class="settings-color-btn" id="btn-ball-color">
+              <span id="val-ball-color">#E8E8E8</span>
+              <span class="settings-dd-swatch" id="swatch-ball" style="background:#e8e8e8"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- BALL SHAPE — dropdown -->
+        <div class="settings-row">
+          <span class="settings-row-label">BALL SHAPE</span>
+          <div class="settings-dropdown" id="dd-ball-shape">
+            <button class="settings-dd-btn" data-setting="ballShape">
+              <span class="settings-dd-value" id="val-ball-shape">SQUARE</span>
+              <span class="settings-dd-arrow">▾</span>
+            </button>
+            <div class="settings-dd-menu" id="menu-ball-shape">
+              <button class="settings-dd-item" data-value="square"   data-label="SQUARE">■ SQUARE</button>
+              <button class="settings-dd-item" data-value="circle"   data-label="CIRCLE">● CIRCLE</button>
+              <button class="settings-dd-item" data-value="triangle" data-label="TRIANGLE">▲ TRIANGLE</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-divider"></div>
+
+        <!-- BALL TRAIL — toggle -->
+        <div class="settings-row">
+          <span class="settings-row-label">BALL TRAIL</span>
+          <button class="settings-switch active" id="toggle-ball-trail" data-setting="ballTrail">
+            <span class="switch-label switch-i">I</span>
+            <span class="switch-thumb"></span>
+            <span class="switch-label switch-o">O</span>
+          </button>
+        </div>
+
+        <!-- BALL SPIN — toggle -->
+        <div class="settings-row">
+          <span class="settings-row-label">BALL SPIN</span>
+          <button class="settings-switch active" id="toggle-ball-spin" data-setting="ballSpin">
+            <span class="switch-label switch-i">I</span>
+            <span class="switch-thumb"></span>
+            <span class="switch-label switch-o">O</span>
+          </button>
+        </div>
+
+        <!-- GOAL PULSE — toggle -->
+        <div class="settings-row">
+          <span class="settings-row-label">GOAL PULSE</span>
+          <button class="settings-switch active" id="toggle-goal-pulse" data-setting="goalPulse">
+            <span class="switch-label switch-i">I</span>
+            <span class="switch-thumb"></span>
+            <span class="switch-label switch-o">O</span>
+          </button>
+        </div>
+
+        <!-- BACKGROUND PARTICLES -->
+        <div class="settings-row">
+          <span class="settings-row-label">BACKGROUND PARTICLES</span>
+          <button class="settings-switch active" id="toggle-background-particles">
+            <span class="switch-label switch-i">I</span>
+            <span class="switch-thumb"></span>
+            <span class="switch-label switch-o">O</span>
+          </button>
+        </div>
+
+        <!-- HIT PARTICLES -->
+        <div class="settings-row">
+          <span class="settings-row-label">HIT PARTICLES</span>
+          <button class="settings-switch active" id="toggle-hit-particles">
+            <span class="switch-label switch-i">I</span>
+            <span class="switch-thumb"></span>
+            <span class="switch-label switch-o">O</span>
+          </button>
+        </div>
+
+        <!-- PADDLE PULSE -->
+        <div class="settings-row">
+          <span class="settings-row-label">PADDLE PULSE</span>
+          <button class="settings-switch active" id="toggle-paddle-pulse">
+            <span class="switch-label switch-i">I</span>
+            <span class="switch-thumb"></span>
+            <span class="switch-label switch-o">O</span>
+          </button>
+        </div>
+
+        <!-- PADDLE SHATTER -->
+        <div class="settings-row">
+          <span class="settings-row-label">PADDLE SHATTER</span>
+          <button class="settings-switch active" id="toggle-paddle-shatter">
+            <span class="switch-label switch-i">I</span>
+            <span class="switch-thumb"></span>
+            <span class="switch-label switch-o">O</span>
+          </button>
+        </div>
+
+      </div>
+
+      <button class="overlay-back" id="back-settings">← CLOSE</button>
+    </div>
+  </div>
+
+  <div class="page-content">
+
+    <!-- TITLE -->
+    <div class="game-title-block">
+      <h1 class="game-title font-display">P O N G</h1>
+      <p class="game-subtitle">ADVERSARIAL SYSTEMS EDITION</p>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-wrap">
+
+    <div class="canvas-inner">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Score / labels above canvas -->
+      <div class="hud-player">
+        <span class="hud-score" id="score-player">0</span>
+        <span class="hud-label hud-label-player" id="hud-player-name">USR</span>
+      </div>
+
+      <div class="hud-center">
+        <span class="hud-match-length" id="hud-match-length"></span>
+        <span class="hud-diff-label" id="diff-label">[ INIT ]</span>
+      </div>
+
+      <div class="hud-system">
+        <span class="hud-score" id="score-ai">0</span>
+        <span class="hud-label hud-label-system">SYS</span>
+      </div>
+
+      <!-- Below canvas -->
+      <a class="game-exit-button" href="index.html">← ABORT</a>
+      <p class="game-controls-hint">[W/S] [↑/↓] &nbsp;=&nbsp; MOVE<br>CANVAS CLICK &nbsp;=&nbsp; POINTER LOCK</p>
+      <a class="settings-button" id="settings-btn">SETTINGS ⚙</a>
+    </div>
+
+    </div>
+
+  </div>
+
+  <script src="JS/static/state.js"></script>
+  <script src="JS/static/ai.js"></script>
+  <script src="JS/static/input.js"></script>
+  <script src="JS/static/gameplay.js"></script>
+  <script src="JS/static/render.js"></script>
+  <script src="JS/static/game.js"></script>
+  <script src="JS/static/settings.js"></script>
+</body>
+</html>

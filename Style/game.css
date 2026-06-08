@@ -1,0 +1,664 @@
+/* ============================================================
+   GAME.CSS
+   Layout, HUD, canvas frame, and page-enter animation.
+   Arena walls + ready prompt are drawn on the canvas in JS.
+   base.css handles colors, fonts, reset, and ambient glows.
+   ============================================================ */
+
+
+/* ---- PAGE ENTER/EXIT ANIMATIONS -------------------------------- */
+
+@keyframes pageSlideIn {
+  0%   { opacity: 0; transform: translateY(-28px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pageSlideOut {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-28px); }
+}
+
+.page-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.page-content.page-entering {
+  animation: pageSlideIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.page-content.page-exiting {
+  animation: pageSlideOut 0.45s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  pointer-events: none;
+}
+
+
+/* ---- TITLE BLOCK ----------------------------------------- */
+
+.game-title-block {
+  text-align: center;
+  padding-top: 32px;
+  padding-bottom: 0;
+  flex-shrink: 0;
+}
+
+.game-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(36px, 6vw, 72px);
+  font-weight: 900;
+  letter-spacing: 16px;
+  color: var(--color-text-primary);
+  text-shadow: 0 0 12px var(--color-classic-primary);
+  text-transform: uppercase;
+}
+
+.adaptive-game .game-title {
+  text-shadow: 0 0 12px var(--color-adaptive-primary);
+}
+
+.game-subtitle {
+  font-size: 14px;
+  letter-spacing: 5px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+
+/* ---- HUD SCORES + LABELS (above canvas) ------------------- */
+
+.hud-player,
+.hud-system,
+.hud-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  z-index: 10;
+}
+
+.hud-player {
+  top: -80px;
+  left: 0;
+  align-items: center;
+}
+
+.hud-system {
+  top: -80px;
+  right: 0;
+  align-items: center;
+}
+
+.hud-center {
+  top: -56px;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  text-align: center;
+}
+
+.hud-score {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-text-primary);
+  letter-spacing: 0.04em;
+  transition: color 0.15s, text-shadow 0.15s;
+}
+
+.hud-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  letter-spacing: 0.1em;
+}
+
+.hud-label-player {
+  color: var(--color-player);
+}
+
+/* Score flash on point */
+.hud-score.flash-player {
+  color: var(--color-player);
+  text-shadow: 0 0 24px var(--color-player);
+}
+
+/* Difficulty label */
+.hud-diff-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.diff-bracket {
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.diff-msg-wrap {
+  --diff-pad: 0.42em;
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  line-height: 1;
+  padding: 0 var(--diff-pad);
+  box-sizing: border-box;
+  transition: width 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.diff-msg-sizer {
+  position: absolute;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none;
+  font: inherit;
+  letter-spacing: inherit;
+  left: var(--diff-pad);
+  top: 0;
+}
+
+.diff-msg {
+  position: absolute;
+  left: var(--diff-pad);
+  top: 0;
+  white-space: nowrap;
+  font: inherit;
+  letter-spacing: inherit;
+  opacity: 0;
+  transition: opacity 0.52s ease;
+}
+
+.diff-msg.visible {
+  opacity: 1;
+}
+
+.hud-match-length {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--color-classic-secondary);
+}
+
+.adaptive-game .hud-match-length {
+  color: var(--color-adaptive-secondary);
+}
+
+/* ---- CANVAS WRAP ----------------------------------------- */
+
+.canvas-wrap {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game-canvas {
+  display: block;
+  width: 960px;
+  height: 540px;
+  max-width: 100%;
+  max-height: 100%;
+  cursor: crosshair;
+}
+
+.canvas-inner {
+  position: relative;
+  display: inline-block;
+}
+
+
+/* ---- EXIT BUTTON ----------------------------------------- */
+
+.game-exit-button {
+  position: absolute;
+  bottom: -44px;
+  left: 0px;
+  z-index: 15;
+  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  border: 1px solid var(--color-border-dim);
+  background: rgba(0, 0, 0, 0.35);
+  cursor: crosshair;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+
+.game-exit-button:hover {
+  color: #ff2200;
+  border-color: #ff2200;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 14px rgba(255, 34, 0, 0.45);
+}
+
+
+/* ---- CONTROLS HINT --------------------------------------- */
+
+.game-controls-hint {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: var(--color-classic-secondary);
+  opacity: 0.25;
+  cursor: not-allowed;
+  transition: opacity 0.2s, text-shadow 0.2s;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.game-controls-hint:hover {
+  opacity: 0.85;
+  text-shadow: 0 0 12px var(--color-classic-secondary);
+}
+
+.adaptive-game .game-controls-hint {
+  color: var(--color-adaptive-secondary);
+}
+
+.adaptive-game .game-controls-hint:hover {
+  text-shadow: 0 0 12px var(--color-adaptive-secondary);
+}
+
+
+/* ---- SETTINGS BUTTON ------------------------------------- */
+
+.settings-button {
+  position: absolute;
+  bottom: -44px;
+  right: 0px;
+  z-index: 15;
+  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--color-border-dim);
+  cursor: crosshair;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+
+.settings-button:hover {
+  color: var(--color-settings-primary);
+  border-color: var(--color-settings-primary);
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 14px rgba(255, 208, 0, 0.45);
+}
+
+
+/* ============================================================
+   SETTINGS PANEL — rows, color pickers, dropdown, toggles
+   ============================================================ */
+
+/* ---- PANEL SIZE ------------------------------------------ */
+
+.overlay-panel-settings {
+  max-width: 500px;
+  padding: 40px 44px;
+}
+
+
+/* ---- RESET BUTTON ---------------------------------------- */
+
+.settings-reset-btn {
+  padding: 7px 20px;
+  background: transparent;
+  border: 1px solid var(--color-border-dim);
+  color: var(--color-text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  cursor: crosshair;
+  margin-bottom: 4px;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background 0.15s;
+}
+
+.settings-reset-btn:hover {
+  color: #ff8800;
+  border-color: #ff8800;
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 14px rgba(255, 136, 0, 0.4);
+}
+
+
+/* ---- ROWS ------------------------------------------------ */
+
+.settings-rows {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 10px;
+  margin: 16px 0 8px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  min-height: 44px;
+}
+
+.settings-row-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  transition: color 0.2s;
+}
+
+
+/* ---- DIVIDER --------------------------------------------- */
+
+.settings-divider {
+  height: 1px;
+  background: var(--color-border-dim);
+  margin: 6px 4px;
+}
+
+
+/* ---- PLAYER NAME INPUT ----------------------------------- */
+
+.settings-name-wrap {
+  position: relative;
+}
+
+.settings-name-input {
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  width: 148px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--color-border-dim);
+  color: var(--color-text-primary);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  outline: none;
+  caret-color: var(--color-settings-primary);
+  transition:
+    border-color 0.15s,
+    box-shadow   0.15s,
+    color        0.15s;
+}
+
+.settings-name-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  letter-spacing: 3px;
+}
+
+.settings-name-input:hover {
+  border-color: var(--color-text-muted);
+  box-shadow: 0 0 12px var(--color-text-muted);
+}
+
+.settings-color-pick {
+  position: relative;
+}
+
+/* Hidden native input — triggered via .click() in JS */
+.settings-color-pick input[type="color"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  top: 100%;
+  left: 0;
+  pointer-events: none;
+}
+
+.settings-color-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--color-border-dim);
+  color: var(--color-text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: crosshair;
+  min-width: 148px;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.settings-color-btn:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+  box-shadow: 0 0 12px var(--color-text-muted);
+}
+
+.settings-dd-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+
+/* ---- DROPDOWN (ball shape only) -------------------------- */
+
+.settings-dropdown {
+  position: relative;
+}
+
+.settings-dd-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--color-border-dim);
+  color: var(--color-text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: crosshair;
+  min-width: 148px;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.settings-dd-btn:hover,
+.settings-dropdown.open .settings-dd-btn {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-muted);
+  box-shadow: 0 0 12px var(--color-text-muted);
+}
+
+.settings-dd-value {
+  flex: 1;
+  text-align: left;
+}
+
+.settings-dropdown .settings-dd-arrow {
+  font-size: 14px;
+  opacity: 0.6;
+  transition: transform 0.2s;
+}
+
+.settings-dropdown.open .settings-dd-arrow {
+  transform: scaleY(-1);
+}
+
+.settings-dd-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  min-width: 100%;
+  background: #0a0a16;
+  border: 1px solid var(--color-text-muted);
+  z-index: 50;
+  display: none;
+  flex-direction: column;
+}
+
+.settings-dropdown.open .settings-dd-menu {
+  display: flex;
+}
+
+.settings-dd-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-border-dim);
+  color: var(--color-text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: crosshair;
+  text-align: left;
+  transition: color 0.15s, background 0.15s;
+}
+
+.settings-dd-item:last-child {
+  border-bottom: none;
+}
+
+.settings-dd-item:hover {
+  background: var(--color-border-dim);
+  color: var(--color-text-primary);
+}
+
+.settings-dd-item.active {
+  color: var(--color-text-primary);
+}
+
+
+/* ---- I/O SWITCH ------------------------------------------ */
+
+.settings-switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 88px;
+  height: 36px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid var(--color-border-dim);
+  cursor: crosshair;
+  transition: border-color 0.2s;
+}
+
+.settings-switch:hover {
+  border-color: var(--color-text-muted);
+}
+
+/* Sliding thumb */
+.switch-thumb {
+  position: absolute;
+  top: 3px;
+  width: 40px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-text-muted);
+  transition: left 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ON state — thumb left */
+.settings-switch.active .switch-thumb {
+  left: 3px;
+}
+
+/* OFF state — thumb right */
+.settings-switch:not(.active) .switch-thumb {
+  left: calc(100% - 43px);
+}
+
+/* Labels */
+.switch-label {
+  position: absolute;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  opacity: 0.3;
+  transition: color 0.2s, opacity 0.2s;
+  pointer-events: none;
+}
+
+.switch-i { left: 20px; }
+.switch-o { right: 18px; }
+
+/* ON — I lights yellow */
+.settings-switch.active .switch-i {
+  color: var(--color-settings-primary);
+  opacity: 1;
+}
+
+/* OFF — O lights orange */
+.settings-switch:not(.active) .switch-o {
+  color: var(--color-settings-secondary);
+  opacity: 1;
+}
+
+
+/* ---- RESPONSIVE ------------------------------------------ */
+
+@media (max-width: 700px) {
+  .hud-score {
+    font-size: 36px;
+  }
+  .hud-diff-label {
+    font-size: 13px;
+  }
+  .canvas-wrap {
+    padding: 12px 16px;
+  }
+}

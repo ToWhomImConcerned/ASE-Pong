@@ -1,0 +1,334 @@
+/* ============================================================
+   BASE.CSS
+   Global variables, resets, fonts, and the page pulsation.
+   Every page loads this first.
+   ============================================================ */
+
+
+/* ---- FONTS ------------------------------------------------ */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+
+/* ---- COLOR VARIABLES -------------------------------------- */
+
+:root {
+
+  /* backgrounds */
+  --color-bg:            #07070f;
+  --color-bg-surface:    #0d0d1a;
+  --color-bg-surface-2:  #12121f;
+
+  /* classic card — green/blue family */
+  --color-classic-primary:   #00ff88;
+  --color-classic-secondary: #00cfff;
+  --color-classic-dim:       #00ff8820;
+
+  /* adaptive card - neon red/orange family */
+  --color-adaptive-primary:  #ff2a14;
+  --color-adaptive-secondary:#ffb000;
+  --color-adaptive-dim:      #ff2a1430;
+
+  /* neutral */
+  --color-text-primary:   #e8e8e8;
+  --color-text-muted:     #444470;
+  --color-border-dim:     #1a1a2e;
+
+  /* player paddle / HUD color — overridable via settings */
+  --color-player: #001aff;
+
+  /* settings — yellow family */
+  --color-settings-primary:   #ffdd00;
+  --color-settings-secondary: #ff8800;
+
+  /* pulsation intensity — animated, do not set manually */
+  --pulse-opacity: 0.6;
+}
+
+
+/* ---- RESET ------------------------------------------------ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: 'Share Tech Mono', monospace;
+  overflow-x: hidden;
+  cursor: default;
+}
+
+
+/* ---- PULSATION -------------------------------------------- */
+
+@keyframes pagePulse {
+  0%, 100% { --pulse-opacity: 0.45; }
+  50%       { --pulse-opacity: 0.75; }
+}
+
+@property --pulse-opacity {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0.6;
+}
+
+html {
+  animation: pagePulse 4s ease-in-out infinite;
+}
+
+
+/* ---- AMBIENT EDGE GLOWS ----------------------------------- */
+
+.ambient-wrap {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-wrap::before,
+.ambient-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 380px;
+  height: 100%;
+  opacity: var(--pulse-opacity);
+  transition: opacity 0.1s;
+}
+
+.ambient-wrap::before {
+  left: 0;
+  background: radial-gradient(
+    ellipse at left center,
+    #00ff8830 0%,
+    #00cfff10 40%,
+    transparent 70%
+  );
+}
+
+.ambient-wrap::after {
+  right: 0;
+  background: radial-gradient(
+    ellipse at right center,
+    #ff450030 0%,
+    #ffaa0010 40%,
+    transparent 70%
+  );
+}
+
+
+/* ---- PAGE CONTENT LAYER ----------------------------------- */
+
+.page-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* ---- TYPOGRAPHY UTILITIES --------------------------------- */
+
+.font-display {
+  font-family: 'Orbitron', sans-serif;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.text-classic {
+  color: var(--color-classic-primary);
+}
+
+.text-adaptive {
+  color: var(--color-adaptive-primary);
+}
+
+
+/* ---- SCROLLBAR ------------------------------------------- */
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-border-dim); }
+
+
+/* ============================================================
+   OVERLAY SYSTEM — shared across all pages
+   ============================================================ */
+
+
+/* ---- DIM LAYER ------------------------------------------- */
+
+#dim-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(4, 4, 12, 0.82);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+#dim-layer.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ---- OVERLAY CONTAINER ----------------------------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+}
+
+@keyframes overlayEnter {
+  0%   { opacity: 0; transform: translateY(-40px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes overlayExit {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+
+.overlay.entering {
+  animation: overlayEnter 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  pointer-events: auto;
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.overlay.exiting {
+  animation: overlayExit 0.4s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  pointer-events: none;
+}
+
+
+/* ---- PANEL ----------------------------------------------- */
+
+.overlay-panel {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  padding: 48px 52px;
+  background: var(--color-bg-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  border-radius: 4px;
+}
+
+.overlay-panel-classic {
+  border: 1px solid var(--color-classic-secondary);
+  box-shadow:
+    0 0 40px #00cfff18,
+    0 0 80px #00ff8810,
+    inset 0 0 30px #00cfff06;
+}
+
+.overlay-panel-settings {
+  border: 1px solid var(--color-settings-secondary);
+  box-shadow:
+    0 0 40px #ffdd0018,
+    0 0 80px #ffaa0010,
+    inset 0 0 30px #ffdd0006;
+}
+
+
+/* ---- PANEL TYPOGRAPHY ------------------------------------ */
+
+.overlay-label {
+  font-size: 12px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.overlay-panel-classic  .overlay-label  { color: var(--color-classic-secondary); }
+.overlay-panel-settings .overlay-label  { color: var(--color-settings-secondary); }
+
+.overlay-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: 4px;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.overlay-panel-classic  .overlay-title  { color: var(--color-classic-primary); }
+.overlay-panel-settings .overlay-title  { color: var(--color-settings-primary); }
+
+.overlay-subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+
+/* ---- BACK BUTTON ----------------------------------------- */
+
+.overlay-back {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 3px;
+  cursor: crosshair;
+  margin-top: 8px;
+  transition: color 0.2s ease;
+}
+
+.overlay-back:hover {
+  color: var(--color-text-primary);
+}
+
+
+/* ---- PAGE EXIT / ENTER ANIMATIONS ------------------------ */
+
+@keyframes pageExitUp {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-60px); }
+}
+
+.page-content.exiting {
+  animation: pageExitUp 0.55s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  pointer-events: none;
+}
+
+.page-content.hidden {
+  display: none;
+}
+
+@keyframes pageEnterDown {
+  0%   { opacity: 0; transform: translateY(-60px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.page-content.page-entering {
+  animation: pageEnterDown 0.55s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PONG // ADVERSARIAL SYSTEMS</title>
+  <link rel="stylesheet" href="style/base.css">
+  <link rel="stylesheet" href="style/landing.css">
+</head>
+<body>
+
+  <div class="ambient-wrap"></div>
+
+  <!-- DIM LAYER -->
+  <div id="dim-layer"></div>
+
+  <!-- CLASSIC OVERLAY — difficulty select -->
+  <div id="overlay-classic" class="overlay" aria-hidden="true">
+    <div class="overlay-panel overlay-panel-classic">
+      <p class="overlay-label">// MODE_01 :: STATIC \\</p>
+      <h2 class="overlay-title font-display">SELECT DIFFICULTY</h2>
+      <p class="overlay-subtitle">OBSERVR System Offline<br>Choose your ceiling</p>
+
+      <div class="difficulty-options">
+        <button class="diff-btn diff-init" data-level="easy">
+          <span class="diff-tag">[ INIT ]</span>
+          <span class="diff-desc">Baseline calibration<br>Human variance detected<br>Unoptimized opponent behavior enabled</span>
+        </button>
+        <button class="diff-btn diff-stable" data-level="medium">
+          <span class="diff-tag">[ STABLE ]</span>
+          <span class="diff-desc">Consistent<br>Calculated<br>No quarter</span>
+        </button>
+        <button class="diff-btn diff-prime" data-level="hard">
+          <span class="diff-tag">[ PRIME ]</span>
+          <span class="diff-desc">No hesitation cycle<br>No forgiveness window<br>Error margin: minimal</span>
+        </button>
+        <button class="diff-btn diff-overclock" data-level="hardcore">
+          <span class="diff-tag">[ OVERCLOCK ]</span>
+          <span class="diff-desc">PRESITION.<br>UNRELNT..<br>WRNING:: ---</span>
+        </button>
+      </div>
+
+      <button class="overlay-back" id="back-classic">← ABORT</button>
+    </div>
+  </div>
+
+  <!-- ROUNDS OVERLAY — match length select -->
+  <div id="overlay-rounds" class="overlay" aria-hidden="true">
+    <div class="overlay-panel overlay-panel-classic overlay-panel-rounds">
+      <p class="overlay-label">// MODE_01 :: STATIC \\</p>
+      <h2 class="overlay-title font-display">SELECT RUNTIME</h2>
+      <p class="overlay-subtitle">Define termination condition</p>
+
+      <div class="rounds-options">
+        <button class="rounds-btn" data-score="3">
+          <span class="rounds-tag">[ SCAN ]</span>
+          <span class="rounds-desc">First to 3<br>Initial assessment</span>
+        </button>
+        <button class="rounds-btn" data-score="5">
+          <span class="rounds-tag">[ SEQUENCE ]</span>
+          <span class="rounds-desc">First to 5<br>Pattern verification</span>
+        </button>
+        <button class="rounds-btn" data-score="7">
+          <span class="rounds-tag">[ PROTOCOL ]</span>
+          <span class="rounds-desc">First to 7<br>Behavioral sampling</span>
+        </button>
+        <button class="rounds-btn" data-score="9">
+          <span class="rounds-tag">[ OPERATION ]</span>
+          <span class="rounds-desc">First to 9<br>Complete evaluation</span>
+        </button>
+      </div>
+
+      <button class="overlay-back" id="back-rounds">← ABORT</button>
+    </div>
+  </div>
+
+  <!-- ADAPTIVE OVERLAY — terminal interface -->
+  <div id="overlay-adaptive" class="overlay overlay-adaptive" aria-hidden="true">
+
+    <div class="overlay-terminal">
+
+      <div class="terminal-header">
+        OBSERVR // ADAPTIVE ANALYSIS SYSTEM
+      </div>
+
+      <div class="boot-log" id="boot-log"></div>
+
+      <div class="terminal-footer">
+
+        <div class="terminal-progress-wrap">
+          <div class="boot-progress-bar" id="boot-progress"></div>
+        </div>
+
+        <button class="terminal-execute" id="launch-btn" disabled>
+          EXECUTE...
+        </button>
+
+      </div>
+
+      <button class="terminal-abort" id="back-adaptive">
+        ← ABORT_SEQUENCE
+      </button>
+
+    </div>
+
+  </div>
+
+  <div class="page-content">
+    <div class="landing-wrap">
+
+      <!-- TITLE -->
+      <div class="landing-title-block fade-in">
+        <h1 class="landing-title font-display">P O N G</h1>
+        <p class="landing-subtitle">ADVERSARIAL SYSTEMS EDITION</p>
+      </div>
+
+      <!-- CARDS -->
+      <div class="cards-container">
+
+        <!-- node network canvas — JS draws on this -->
+        <canvas id="node-canvas"></canvas>
+
+        <!-- CLASSIC CARD -->
+        <div class="mode-card card-classic fade-in" id="card-classic">
+          <div class="card-edge edge-top"></div>
+          <div class="card-edge edge-right"></div>
+          <div class="card-edge edge-bottom"></div>
+          <div class="card-edge edge-left"></div>
+          <p class="card-mode-label">// MODE_01 :: STATIC \\</p>
+          <h2 class="card-mode-name">CLASSIC // STATIC OPPONENT</h2>
+          <p class="card-mode-desc">
+            Fixed difficulty tier. Select your ceiling.<br>
+            The system does not learn. It does not adapt.<br>
+            It simply executes.
+          </p>
+        </div>
+
+        <!-- OR DIVIDER -->
+        <div class="or-divider">— OR —</div>
+
+        <!-- ADAPTIVE CARD -->
+        <div class="mode-card card-adaptive fade-in" id="card-adaptive">
+          <div class="card-edge edge-top"></div>
+          <div class="card-edge edge-right"></div>
+          <div class="card-edge edge-bottom"></div>
+          <div class="card-edge edge-left"></div>
+          <p class="card-mode-label">\: MODE_02 :: OBSERVR [LIVE] :/</p>
+          <h2 class="card-mode-name">ADAPTIVE // LEARNING ENTITY</h2>
+          <p class="card-mode-desc">
+            OBSERVR READY -./ MODEL PLATFRM INITIALIZD..<br>
+            EVERY RETRN == /PATTERN FEED::<br>
+            YOU CANNOT SOLVE IT. IT SOLVES YOU.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="js/landing.js"></script>
+
+</body>
+</html>

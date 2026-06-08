@@ -1,6 +1,6 @@
 /* ============================================================
    GAMEPLAY.JS — All rules that change the world.
-   Reads: state, keys, diff, CONFIG, phase
+   Reads: state, keys, CONFIG, phase
    Writes: state (positions, scores, speed), phase
    Calls: aiUpdate() from ai.js
    No rendering. No event listeners.
@@ -33,14 +33,10 @@ function resetPositions() {
   state.ballTrail  = [];
   state.playerVY          = 0;
   state.playerMouseTarget = state.player.y + CONFIG.PADDLE_H / 2;
-  driftOffset           = 0;
-  driftTimer            = 0;
-  aiRecomputeTimer      = 0;
-  aiSmoothedTarget      = null;
-  aiTrajectoryCommitY   = null;
+  aiSmoothedTarget = null;
   state.player.visible = true;
-  state.ai.visible = true;
-  state.paddleShards = [];
+  state.ai.visible     = true;
+  state.paddleShards   = [];
 }
 
 function launchBall() {
@@ -48,6 +44,7 @@ function launchBall() {
   const dir   = Math.random() < 0.5 ? 1 : -1;
   state.ball.vx = Math.cos(angle) * state.speed * dir;
   state.ball.vy = Math.sin(angle) * state.speed;
+  aiObserveLaunch();
 }
 
 
@@ -130,7 +127,7 @@ function spawnCollisionParticles(type, cx, cy, inVx, inVy, paddleCol) {
     const size = CP_SIZE_MIN + Math.random() * (CP_SIZE_MAX - CP_SIZE_MIN);
 
     const particle = {
-      x:        spawnX + (Math.random() * 4 - 2),
+      x:        spawnX + (Math.random() * 4 - 2), // tiny positional jitter
       y:        spawnY + (Math.random() * 4 - 2),
       vx:       pVx * speedMag,
       vy:       pVy * speedMag,
@@ -139,8 +136,10 @@ function spawnCollisionParticles(type, cx, cy, inVx, inVy, paddleCol) {
       rotation: Math.random() * Math.PI * 2,
       rotSpeed: (-0.05 + Math.random() * 0.10) * (1 + intensity),
       size,
+      // Rect fragments get randomized paddle-debris proportions
       rectW:    size * (0.7 + Math.random() * 1.1),
       rectH:    size * (0.35 + Math.random() * 0.7),
+      // Shape: paddle fragments are always rect; ball fragments match ball shape
       shape:    isPaddleFragment ? 'rect' : ballShape,
       color:    isPaddleFragment ? paddleCol : ballCol,
     };
@@ -157,41 +156,23 @@ function spawnCollisionParticles(type, cx, cy, inVx, inVy, paddleCol) {
 
 // ================================================================
 //  GOAL SHATTER
-//
-//  ballY    ball's Y position at the moment of the goal — used to
-//           compute the impact point on the paddle, which biases
-//           the shard directions (ball near top → shards angle down,
-//           ball near bottom → shards angle up, dead center → even).
-//
-//  Structure: irregular strips instead of a uniform grid.
-//  Each strip is subdivided into 1–3 shards of randomized height,
-//  giving a structural-collapse feel rather than a clean tile break.
-//
-//  Motion: zero-gravity, slow drag (vx/vy *= SHARD_DRAG each frame).
-//  Delay: each shard has a 0–8 frame hold before it starts moving,
-//  creating a subtle ripple/pulse from impact point outward.
-//
-//  Fade: holds near full opacity for ~40% of life then linear fade,
-//  matching the collision particle aesthetic.
 // ================================================================
 
-// Tunable shatter constants
-const SHARD_COLS        = 3;    // columns across paddle width (more cols = squarer pieces)
-const SHARD_ROWS        = 9;    // rows down paddle height (col×row grid, then height-randomized)
-const SHARD_LIFE        = 120;  // frames — total shard lifetime
-const SHARD_DRAG        = 0.996; // multiplicative drag per frame — near 1 so shards drift the full life
-const SHARD_DELAY_MAX   = 8;    // max frame delay before a shard starts moving
-const SHARD_SPEED_H     = 1.5;  // base horizontal ejection speed
-const SHARD_SPEED_H_VAR = 5;  // random variance on horizontal speed
-const SHARD_SPEED_V     = 3;  // max vertical speed — high so angle influence reads clearly
-const SHARD_SPIN_MAX    = 0.2; // max rotation speed (rad/frame)
+const SHARD_COLS        = 3;
+const SHARD_ROWS        = 9;
+const SHARD_LIFE        = 120;
+const SHARD_DRAG        = 0.996;
+const SHARD_DELAY_MAX   = 8;
+const SHARD_SPEED_H     = 1.5;
+const SHARD_SPEED_H_VAR = 5;
+const SHARD_SPEED_V     = 3;
+const SHARD_SPIN_MAX    = 0.2;
 
 function spawnPaddleShatter(side, ballY) {
   const paddle    = side === 'player' ? state.player : state.ai;
-  const color     = side === 'player' ? playerColor() : diffColor1();
+  const color     = side === 'player' ? playerColor() : aiPaddleColor();
   const shockDirX = side === 'player' ? 1 : -1;
 
-  // Impact bias: -1 = ball hit top edge, 0 = center, +1 = bottom edge
   const impactBias = Math.max(-1, Math.min(1,
     (ballY - (paddle.y + paddle.h * 0.5)) / (paddle.h * 0.5)
   ));
@@ -201,27 +182,17 @@ function spawnPaddleShatter(side, ballY) {
 
   for (let col = 0; col < SHARD_COLS; col++) {
     for (let row = 0; row < SHARD_ROWS; row++) {
-
-      // Randomize each shard's size within its cell — reads as rubble, not a grid
       const w = baseW * (0.65 + Math.random() * 0.6);
       const h = baseH * (0.65 + Math.random() * 0.6);
-
-      // Jitter position within the cell so edges don't align perfectly
       const x = paddle.x + col * baseW + (baseW - w) * Math.random();
       const y = paddle.y + row * baseH + (baseH - h) * Math.random();
-
       const shardCY = y + h * 0.5;
 
-      // Delay: shards near impact point fire first, ripple outward
       const distFromImpact = Math.abs(shardCY - ballY);
       const delay = Math.round((distFromImpact / paddle.h) * SHARD_DELAY_MAX);
 
-      // Horizontal: consistent outward ejection with variance
       const vx = shockDirX * (SHARD_SPEED_H + Math.random() * SHARD_SPEED_H_VAR);
 
-      // Vertical — two additive components:
-      //   shardBias:  shard's own position (top shards go up, bottom go down)
-      //   impactBias: ball impact point fans shards away from it
       const shardBias = (shardCY - (paddle.y + paddle.h * 0.5)) / (paddle.h * 0.5);
       const vy = (shardBias * 0.65 - impactBias * 0.55)
                * SHARD_SPEED_V
@@ -280,10 +251,12 @@ function update() {
   const FRICTION = 0.94;
 
   if (state.pointerLocked) {
-    const diff = state.playerMouseTarget - (player.y + player.h / 2);
-    const step = diff * 0.04;
+    // Mouse: drive velocity toward the target position
+    const gap = state.playerMouseTarget - (player.y + player.h / 2);
+    const step = gap * 0.04;
     state.playerVY = step;
   } else {
+    // Keyboard: accelerate/decelerate
     const movingUp   = keys.ArrowUp   || keys.w;
     const movingDown = keys.ArrowDown || keys.s;
 
@@ -292,13 +265,16 @@ function update() {
     else                 state.playerVY *= FRICTION;
   }
 
+  // Clamp velocity to max player speed
   state.playerVY = Math.max(-CONFIG.PLAYER_SPEED, Math.min(CONFIG.PLAYER_SPEED, state.playerVY));
 
   player.y += state.playerVY;
 
+  // Clamp player inside arena with gap
   const margin = CONFIG.BALL_SIZE * 1.3;
   player.y = Math.max(margin, Math.min(H - player.h - margin, player.y));
 
+  // Kill velocity if clamped against a wall
   if (player.y <= margin || player.y >= H - player.h - margin) state.playerVY = 0;
 
   // AI movement
@@ -312,13 +288,13 @@ function update() {
   // Capture incoming velocity before flip so spawn gets the arrival direction
   if (ball.y - r <= 0) {
     ball.y = r;
-    const preVy = ball.vy;
+    const preVy = ball.vy;          // negative (ball was moving up)
     ball.vy = Math.abs(ball.vy);
     spawnCollisionParticles('wall', ball.x, ball.y, ball.vx, preVy);
   }
   if (ball.y + r >= H) {
     ball.y = H - r;
-    const preVy = ball.vy;
+    const preVy = ball.vy;          // positive (ball was moving down)
     ball.vy = -Math.abs(ball.vy);
     spawnCollisionParticles('wall', ball.x, ball.y, ball.vx, preVy);
   }
@@ -363,11 +339,14 @@ function onPaddleHit(who) {
   const preVx = ball.vx;
   const preVy = ball.vy;
 
+  // Capture incoming angle before flipping — negate vy so we think in terms
+  // of "outgoing" frame (positive angle = upward away from paddle)
   const incomingAngle = Math.atan2(-ball.vy, Math.abs(ball.vx));
 
   ball.vx = -ball.vx;
   const dir = ball.vx > 0 ? 1 : -1;
 
+  // Where on the paddle the ball hit (-1 = top edge, 0 = center, 1 = bottom edge)
   const hitPos   = (ball.y - (paddle.y + paddle.h / 2)) / (paddle.h / 2);
 
   const MAX_ANGLE   = 60 * (Math.PI / 180);
@@ -390,6 +369,8 @@ function onPaddleHit(who) {
   ball.vx = dir * Math.cos(finalAngle) * state.speed;
   ball.vy =       Math.sin(finalAngle) * state.speed;
 
+  aiObservePaddleHit(who, hitPos, incomingAngle);
+
   // Push ball clear of paddle to prevent double-hits
   if (who === 'player') {
     ball.x = paddle.x + paddle.w + CONFIG.BALL_SIZE / 2 + 1;
@@ -398,9 +379,10 @@ function onPaddleHit(who) {
   }
 
   // Spawn collision particles using the paddle's color as secondary
-  const paddleCol = who === 'player' ? playerColor() : diffColor1();
+  const paddleCol = who === 'player' ? playerColor() : aiPaddleColor();
   spawnCollisionParticles('paddle', ball.x, ball.y, preVx, preVy, paddleCol);
 }
+
 
 // ================================================================
 //  SCORING
@@ -410,6 +392,7 @@ function onPoint(scorer) {
   state.ballFade = 1;
   phase = 'ROUND_END';
   releasePointerLock();
+  aiObserveRallyEnd(scorer);
 
   if (settings.paddleShatter) {
     if (scorer === 'player') {
@@ -525,8 +508,8 @@ function updateHUD() {
 function flashScore(who) {
   const el       = who === 'player' ? hudScorePlayer : hudScoreAi;
   const realVal  = who === 'player' ? state.player.score : state.ai.score;
-  const duration = 400;
-  const interval = 40;
+  const duration = 400;  // total scramble time ms
+  const interval = 40;   // how fast digits flip ms
   let elapsed    = 0;
 
   const scramble = setInterval(() => {
@@ -542,7 +525,7 @@ function flashScore(who) {
     hudScorePlayer.classList.add('flash-player');
     setTimeout(() => hudScorePlayer.classList.remove('flash-player'), 400);
   } else {
-    const col = diffColor1();
+    const col = aiPaddleColor();
     hudScoreAi.style.color      = col;
     hudScoreAi.style.textShadow = `0 0 24px ${col}`;
     setTimeout(() => {
