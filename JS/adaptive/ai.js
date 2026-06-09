@@ -364,24 +364,47 @@ const THREAT_MSGS = {
   early: [
     'OBSERVING...',
     'CALIBRATING...',
-    'CONVERGENCE: 2%',
-    'PATTRN ARCHIVD...',
+    'CONVERGENCE: 3%',
+    'CONVERGENCE: 7%',
+    'CONVERGENCE: 11%',
+    'PATTERN MATCHING...',
     'SAMPL LOGGED...',
     'ANALYZING...',
     'WATCHING...',
+    'CONFIGURING...',
+    'REGISTERING ERROR...',
+    'AQUIRING VECTOR...',
+    'SCANNING...',
+    'MEASURING ERROR PROBABILITY...',
+    'BEHAVIOR UNKNOWN::RERUN...',
+    'TRACKING TRAJECTORY...',
+    'BASELINE:..ESTABLISHING...',
+    'RECORDING...',
+    'MOTION LOGGED...'
+
   ],
   mid: [
     'ANTICIPATING...',
     'ABSORBNG...',
     'CATALOGING...',
+    'PROCESSING',
     'RECALC\u2591\u2591\u2591ULATING...',
-    'CONVRGENCE: 61%',
+    'CONVRGENCE: 58%',
+    'CONVERGENCE: 64%',
+    'CONVERGENCE: 71%',
     'CONVERGNCE: -CRPTD',
     'VECTR::RECAL',
     'REFINING...',
     'ADJUSTING...',
     'PREDICTING...',
     'PATTRN ARCHIVD...',
+    'HEURISTICS UPDATED...',
+    'GNRATE COUNTR...',
+    'INTENT INFERRED...',
+    'VARIANCE REDUCD...',
+    'PROJECTING OUTCOMES...',
+    'STABALIZING...',
+    'PREPRE EXECUTE SEQUENCE...',
   ],
   late: [
     'CONVERGENCE: COMPLETE',
@@ -395,8 +418,19 @@ const THREAT_MSGS = {
     'SYN_ADAPT::LOCK',
     'MODL_V[?] ONLINE',
     '//MUTATION APPLIED//',
-    'CNTRL ASSERTED',
+    'CNTRL::ASSRT\u2591D',
     'SHFT::OVRWRITE',
+    'COUNTR PRECOMPUTED',
+    'ALL PATHS INDEXED',
+    'ADAPT CEILING BREACH',
+    'BEHAVIOR SUBSUMED',
+    'PREDICTION DEPTH::EXCEED.:',
+    'COGN\u2591TION CONVERGD..',
+    'MODEL::SIMULATED',
+    'SEARCH SP_CE COLLPSD',
+    'PATTRN EXHAUSTED...',
+    'INPUT:_REDND-HIDE',
+    '\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591\u2591',
   ],
 };
 
@@ -452,6 +486,8 @@ function initThreatLabel() {
   threatMsgBEl.textContent = '';
   threatMsgAEl.classList.add('visible');
   threatMsgBEl.classList.remove('visible');
+  threatMsgAEl.classList.remove('boot-glitch');
+  threatMsgBEl.classList.remove('boot-glitch');
   syncThreatWrapWidth(threatCurrent);
   requestAnimationFrame(() => syncThreatWrapWidth(threatCurrent));
 }
@@ -474,8 +510,13 @@ function advanceThreatMessage(now) {
   inEl.textContent = incoming;
   syncThreatWrapWidth(incoming);
 
-  outEl.classList.remove('visible');
+  outEl.classList.remove('visible', 'boot-glitch');
   inEl.classList.add('visible');
+  if (threatTier() === 'late') {
+    inEl.classList.add('boot-glitch');
+  } else {
+    inEl.classList.remove('boot-glitch');
+  }
 
   threatActive  = threatActive === 'a' ? 'b' : 'a';
   threatCurrent = incoming;

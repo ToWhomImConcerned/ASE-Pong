@@ -105,8 +105,16 @@ pulse comes from wherever the ball passes the goal line (e.g. if ball is above p
 paddle shouldn't break evenly, should instead look like a structural collapse under the "weight" of the pulse.
 shards slowly disperse and fade, similar to collision particle effect.
 
-CHANGE NAME LENGTH TO 3 PLAYER NAME: USR STATIC NAME: SYS ADAPTIVE NAME: OBS
+CHANGE NAME LENGTH TO 3 PLAYER NAME: USR STATIC NAME: SYS ADAPTIVE NAME: OBS (DONE)
 
-add screen scaling, fix adaptive ai, add smoothing and fix stable and prime, fix overclock jitter
+add screen scaling, fix adaptive ai (done), add smoothing and fix stable and prime (done), fix overclock jitter (done)
 
 MAKE IT IMPOSSIBLE FOR THE AI OPPONENT TO EVER MISS THE BALL IF THE BALL IS SERVED IN THE AI DIRECTION, 100% HIT RATE ON FIRST HIT UNLESS BALL IS SERVED IN DIRECTION OF PLAYER, THEN FIRST RETURN GOES BACK TO NORMAL RULES
+
+fix flicker for late game adaptive label (DONE)
+
+redo landing page game mode cards, revisit fluid border animations
+
+scan animation for pong landing page label
+
+BE PROUD OF YOURSELF! C: <3

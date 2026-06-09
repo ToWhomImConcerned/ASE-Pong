@@ -662,3 +662,34 @@
     padding: 12px 16px;
   }
 }
+
+/* ---- THREAT LABEL GLITCH (adaptive late-game only) ------- */
+
+@keyframes subtleBootGlitch {
+  0%, 64%, 100% {
+    transform: translateX(0);
+    filter: none;
+    opacity: 1;
+  }
+  68% {
+    transform: translateX(1px);
+    filter: brightness(1.38);
+    opacity: 0.82;
+  }
+  72% {
+    transform: translateX(-1px);
+    filter: brightness(0.84);
+    opacity: 1;
+  }
+  76% {
+    transform: translateX(0);
+    filter: brightness(1.18);
+    opacity: 0.9;
+  }
+}
+
+.boot-glitch {
+  will-change: transform, filter, opacity;
+  animation:
+    subtleBootGlitch 1.15s steps(2, end) infinite;
+}
