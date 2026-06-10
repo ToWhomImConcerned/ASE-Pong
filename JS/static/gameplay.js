@@ -387,6 +387,10 @@ function onPaddleHit(who) {
   state.lastHit = who;
   paddle.hitPulse = 1.0;
 
+  // Instantly set rotation direction based on paddle hit
+  // Player hit → clockwise (positive), AI hit → counter-clockwise (negative)
+  ballRotation = who === 'player' ? 0.1 : -0.1;
+
   ball.vx = dir * Math.cos(finalAngle) * state.speed;
   ball.vy =       Math.sin(finalAngle) * state.speed;
 

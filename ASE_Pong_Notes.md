@@ -117,4 +117,8 @@ redo landing page game mode cards, revisit fluid border animations
 
 scan animation for pong landing page label
 
+Change ball rotation to spin clockwise when moving to the right and counter-clockwise when moving to the left. Player paddle hit instantly changes rotation to clockwise and AI paddle hit instantly changes rotation to counter-clockwise. Same rules apply for initialization of a round before either paddle touches the ball. Moving right = clockwise. Moving left = counter-clockwise.
+
+On initialization of a round, the ball trail should ALWAYS be white before touching a paddle. The rule is if the ball hasn't touched a paddle yet, the ball trail is white.
+
 BE PROUD OF YOURSELF! C: <3

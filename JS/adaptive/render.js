@@ -101,28 +101,64 @@ function drawGameOverOverlay(W, H) {
   const pulse  = 0.4 + 0.6 * (0.5 + 0.5 * Math.sin(Date.now() / 400));
   const cx     = W / 2;
   const cy     = H / 2;
-  const result = state.gameOverResult || 'TERMINATED';
-  const isWin  = result === 'OVERRIDDEN';
-  const col    = isWin ? '#00ff88' : '#ff4500';
+  const result = state.gameOverResult || ['TERMINATED'];
+  const lines  = Array.isArray(result) ? result : [result];
+  const isWin  = state.gameOverIsWin || false;
+  const col    = isWin ? playerColor() : '#ff4500';
+
+  // Glitch effect calculation (mimics CSS subtleBootGlitch animation)
+  const glitchTime = (Date.now() % 1150) / 1150;
+  let glitchX = 0;
+  let glitchBrightness = 1;
+  let glitchOpacity = 1;
+
+  if (glitchTime >= 0.64 && glitchTime < 0.68) {
+    glitchX = 1;
+    glitchBrightness = 1.38;
+    glitchOpacity = 0.82;
+  } else if (glitchTime >= 0.68 && glitchTime < 0.72) {
+    glitchX = -1;
+    glitchBrightness = 0.84;
+    glitchOpacity = 1;
+  } else if (glitchTime >= 0.72 && glitchTime < 0.76) {
+    glitchX = 0;
+    glitchBrightness = 1.18;
+    glitchOpacity = 0.9;
+  }
+
+  // Draw the 3 result lines with glitch effect
+  const lineSpacing = 52;
+  const startY = cy - 48;
+
+  lines.forEach((line, i) => {
+    ctx.save();
+    ctx.translate(glitchX, 0);
+    ctx.globalAlpha = glitchOpacity;
+    ctx.font         = 'bold 42px Orbitron, monospace';
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle    = col;
+    ctx.shadowColor  = col;
+    ctx.shadowBlur   = 32;
+
+    // Apply brightness effect via filter
+    ctx.filter = `brightness(${glitchBrightness})`;
+
+    ctx.fillText(line, cx, startY + i * lineSpacing);
+    ctx.restore();
+  });
 
   ctx.save();
-  ctx.font         = 'bold 52px Orbitron, monospace';
-  ctx.textAlign    = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle    = col;
-  ctx.shadowColor  = col;
-  ctx.shadowBlur   = 32;
-  ctx.fillText(result, cx, cy - 48);
-  ctx.restore();
-
-  ctx.save();
+  ctx.translate(glitchX, 0);
+  ctx.globalAlpha = glitchOpacity;
   ctx.font         = 'bold 36px Orbitron, monospace';
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle    = '#e8e8e8';
   ctx.shadowColor  = col;
   ctx.shadowBlur   = 14;
-  ctx.fillText(`${state.player.score}  —  ${state.ai.score}`, cx, cy + 10);
+  ctx.filter = `brightness(${glitchBrightness})`;
+  ctx.fillText(`${state.player.score}  —  ${state.ai.score}`, cx, cy + lineSpacing * lines.length + 10);
   ctx.restore();
 
   ctx.save();
@@ -131,7 +167,7 @@ function drawGameOverOverlay(W, H) {
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillStyle    = adaptiveSecondaryColor();
-  ctx.fillText('SPACE / CLICK  =  REINITIALIZE', cx, cy + 58);
+  ctx.fillText('SPACE / CLICK  =  REINITIALIZE', cx, cy + lineSpacing * lines.length + 58);
   ctx.restore();
 }
 
@@ -458,9 +494,13 @@ function drawBall() {
   const r     = CONFIG.BALL_SIZE / 2;
   const speed = Math.sqrt(vx * vx + vy * vy);
 
-  if (settings.ballSpin) ballRotation += speed * 0.01;
+  if (settings.ballSpin) {
+    // Clockwise when moving right (vx > 0), counter-clockwise when moving left (vx < 0)
+    const direction = vx > 0 ? 1 : -1;
+    ballRotation += speed * 0.01 * direction;
+  }
 
-  const trailCol = state.lastHit === 'player' ? playerColor() : aiPaddleColor();
+  const trailCol = state.lastHit === null ? '#ffffff' : (state.lastHit === 'player' ? playerColor() : aiPaddleColor());
   const ballCol  = settings.ballColor;
   const shape    = settings.ballShape;
 

@@ -92,7 +92,7 @@
         </div>
 
         <button class="terminal-execute" id="launch-btn" disabled>
-          EXECUTE...
+          RUNTIME...
         </button>
 
       </div>
@@ -103,6 +103,36 @@
 
     </div>
 
+  </div>
+
+  <!-- ADAPTIVE ROUNDS OVERLAY — runtime select -->
+  <div id="overlay-adaptive-rounds" class="overlay" aria-hidden="true">
+    <div class="overlay-panel overlay-panel-adaptive overlay-panel-adaptive-rounds">
+      <p class="overlay-label">\: MODE_02 :: OBSERVR [LIVE] :/</p>
+      <h2 class="overlay-title font-display">SELECT RUNTIME</h2>
+      <p class="overlay-subtitle">Define analysis duration</p>
+
+      <div class="adaptive-rounds-options">
+        <button class="adaptive-rounds-btn" data-score="3">
+          <span class="adaptive-rounds-tag">[ SCAN ]</span>
+          <span class="adaptive-rounds-desc">First to 3<br>Initial assessment</span>
+        </button>
+        <button class="adaptive-rounds-btn" data-score="5">
+          <span class="adaptive-rounds-tag">[ SEQUENCE ]</span>
+          <span class="adaptive-rounds-desc">First to 5<br>Pattern verification</span>
+        </button>
+        <button class="adaptive-rounds-btn" data-score="7">
+          <span class="adaptive-rounds-tag">[ PROTOCOL ]</span>
+          <span class="adaptive-rounds-desc">First to 7<br>Behavioral sampling</span>
+        </button>
+        <button class="adaptive-rounds-btn" data-score="9">
+          <span class="adaptive-rounds-tag">[ OPERATION ]</span>
+          <span class="adaptive-rounds-desc">First to 9<br>Complete evaluation</span>
+        </button>
+      </div>
+
+      <button class="overlay-back" id="back-adaptive-rounds">← ABORT</button>
+    </div>
   </div>
 
   <div class="page-content">

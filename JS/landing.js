@@ -398,16 +398,19 @@ const dimLayer       = document.getElementById('dim-layer');
 const overlayClassic = document.getElementById('overlay-classic');
 const overlayRounds  = document.getElementById('overlay-rounds');
 const overlayAdaptive= document.getElementById('overlay-adaptive');
+const overlayAdaptiveRounds = document.getElementById('overlay-adaptive-rounds');
 const overlayTerminal= document.querySelector('.overlay-terminal');
 const backClassic    = document.getElementById('back-classic');
 const backRounds     = document.getElementById('back-rounds');
 const backAdaptive   = document.getElementById('back-adaptive');
+const backAdaptiveRounds = document.getElementById('back-adaptive-rounds');
 const bootLog        = document.getElementById('boot-log');
 const bootProgress   = document.getElementById('boot-progress');
 const launchBtn      = document.getElementById('launch-btn');
 
 let activeOverlay  = null;
 let pendingDiffKey = null;   // set when difficulty chosen, consumed when rounds chosen
+let pendingRuntime = null;   // set when runtime chosen for adaptive mode
 let bootTimeout    = null;
 let bootTimers     = [];
 let bootLateThreatPhase = false;
@@ -481,12 +484,44 @@ launchBtn.addEventListener('click', () => {
   panel.style.transform  = 'translateY(-110%)';
   panel.style.opacity    = '0';
 
-  dimLayer.style.transition = 'opacity 0.4s ease';
-  dimLayer.classList.remove('visible');
-
+  // Hide adaptive overlay, show adaptive rounds overlay (dim stays visible)
   setTimeout(() => {
-    window.location.href = 'adaptive.html';
-  }, 420);
+    overlayAdaptive.classList.remove('active');
+    overlayAdaptive.setAttribute('aria-hidden', 'true');
+    // Reset terminal panel transform for future re-entry
+    panel.style.transition = '';
+    panel.style.transform  = '';
+    panel.style.opacity    = '';
+
+    activeOverlay = 'adaptive-rounds';
+    overlayAdaptiveRounds.setAttribute('aria-hidden', 'false');
+    overlayAdaptiveRounds.classList.add('entering');
+    overlayAdaptiveRounds.addEventListener('animationend', () => {
+      overlayAdaptiveRounds.classList.remove('entering');
+      overlayAdaptiveRounds.classList.add('active');
+    }, { once: true });
+  }, 340);
+});
+
+// ---- ADAPTIVE ROUNDS buttons → navigate --------------------
+
+document.querySelectorAll('.adaptive-rounds-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const score = btn.dataset.score;
+
+    // Slide adaptive rounds panel up and out, then navigate
+    const adaptiveRoundsPanel = overlayAdaptiveRounds.querySelector('.overlay-panel-adaptive-rounds');
+    adaptiveRoundsPanel.style.transition = 'transform 0.45s cubic-bezier(0.55, 0, 1, 0.45), opacity 0.35s ease';
+    adaptiveRoundsPanel.style.transform  = 'translateY(-110%)';
+    adaptiveRoundsPanel.style.opacity    = '0';
+
+    dimLayer.style.transition = 'opacity 0.4s ease';
+    dimLayer.classList.remove('visible');
+
+    setTimeout(() => {
+      window.location.href = `adaptive.html?score=${score}`;
+    }, 420);
+  });
 });
 
 function openOverlay(which) {
@@ -522,6 +557,7 @@ function closeOverlay() {
   let overlay;
   if (activeOverlay === 'classic') overlay = overlayClassic;
   else if (activeOverlay === 'rounds') overlay = overlayRounds;
+  else if (activeOverlay === 'adaptive-rounds') overlay = overlayAdaptiveRounds;
   else overlay = overlayAdaptive;
 
   // clear any running boot sequence (only relevant for adaptive)
@@ -552,6 +588,7 @@ function closeOverlay() {
 
   activeOverlay  = null;
   pendingDiffKey = null;
+  pendingRuntime = null;
 }
 
 // Card clicks
@@ -562,6 +599,7 @@ cardAdaptive.addEventListener('click', () => openOverlay('adaptive'));
 backClassic.addEventListener('click',  closeOverlay);
 backRounds.addEventListener('click',   closeOverlay);
 backAdaptive.addEventListener('click', closeOverlay);
+backAdaptiveRounds.addEventListener('click', closeOverlay);
 
 // Escape key
 document.addEventListener('keydown', (e) => {
@@ -577,7 +615,7 @@ function resetBootSequence() {
   bootLateThreatPhase = false;
   bootLog.innerHTML = '';
   launchBtn.disabled = true;
-  launchBtn.textContent = 'EXECUTE...';
+  launchBtn.textContent = 'RUNTIME...';
   overlayTerminal.classList.remove('is-breaching', 'breach-critical');
 
   bootProgress.style.transition = 'none';
@@ -724,7 +762,7 @@ function runBootSequence() {
 
   bootTimeout = setTimeout(() => {
     launchBtn.disabled = false;
-    launchBtn.textContent = 'EXECUTE...';
+    launchBtn.textContent = 'RUNTIME...';
   }, delay + 420);
   bootTimers.push(bootTimeout);
 }

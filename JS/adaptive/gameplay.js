@@ -34,6 +34,7 @@ function resetPositions() {
   state.playerVY          = 0;
   state.playerMouseTarget = state.player.y + CONFIG.PADDLE_H / 2;
   aiSmoothedTarget = null;
+  aiForcedMissSmoothed = 0;
   state.player.visible = true;
   state.ai.visible     = true;
   state.paddleShards   = [];
@@ -45,6 +46,7 @@ function launchBall() {
   state.ball.vx = Math.cos(angle) * state.speed * dir;
   state.ball.vy = Math.sin(angle) * state.speed;
   aiObserveLaunch();
+  aiObserveLaunchDirection();
 }
 
 
@@ -366,6 +368,10 @@ function onPaddleHit(who) {
   state.lastHit = who;
   paddle.hitPulse = 1.0;
 
+  // Instantly set rotation direction based on paddle hit
+  // Player hit → clockwise (positive), AI hit → counter-clockwise (negative)
+  ballRotation = who === 'player' ? 0.1 : -0.1;
+
   ball.vx = dir * Math.cos(finalAngle) * state.speed;
   ball.vy =       Math.sin(finalAngle) * state.speed;
 
@@ -455,7 +461,20 @@ function resumeGame() {
 
 function showGameOver(result) {
   phase = 'GAME_OVER';
-  state.gameOverResult = result === 'WIN' ? 'OVERRIDDEN' : 'TERMINATED';
+  state.gameOverIsWin = result === 'WIN';
+  if (result === 'WIN') {
+    state.gameOverResult = [
+      'VARIANCE THRESHOLD EXCEEDED',
+      'SUBJECT TENDENCIES ARCHIVED',
+      'OBSERVATION CONTINUES'
+    ];
+  } else {
+    state.gameOverResult = [
+      'RESPONSE MAPPING COMPLETE',
+      'SUBJECT DATA RETAINED',
+      'OBSERVATION CONTINUES'
+    ];
+  }
 }
 
 function restartGame() {

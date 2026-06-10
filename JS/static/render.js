@@ -467,9 +467,13 @@ function drawBall() {
   const r     = CONFIG.BALL_SIZE / 2;
   const speed = Math.sqrt(vx * vx + vy * vy);
 
-  if (settings.ballSpin) ballRotation += speed * 0.01;
+  if (settings.ballSpin) {
+    // Clockwise when moving right (vx > 0), counter-clockwise when moving left (vx < 0)
+    const direction = vx > 0 ? 1 : -1;
+    ballRotation += speed * 0.01 * direction;
+  }
 
-  const trailCol = state.lastHit === 'player' ? playerColor() : diffColor1();
+  const trailCol = state.lastHit === null ? '#ffffff' : (state.lastHit === 'player' ? playerColor() : diffColor1());
   const ballCol  = settings.ballColor;
   const shape    = settings.ballShape;
 

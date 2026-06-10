@@ -222,7 +222,7 @@ const settings = {
 
   playerColor:           '#ffffff',     // CSS hex — also synced to --color-player
 
-  ballColor:             '#e8e8e8',     // actual ball core color
+  ballColor:             '#ffffff',     // actual ball core color
 
   ballShape:             'square',      // 'square' | 'circle' | 'triangle'
 
@@ -258,11 +258,11 @@ const aiMemory = {
 
   behavior: {
 
-    reactionDelay:   180,
+    reactionDelay:   135,
 
-    missRate:        0.38,
+    missRate:        0.28,
 
-    predictionNoise: 48,
+    predictionNoise: 38,
 
   },
 
@@ -307,6 +307,10 @@ let aiRecomputeTimer      = 0;
 let aiTrajectoryCommitY   = null;
 
 let aiBiasSmoothed        = 0;
+
+let aiForcedMissSmoothed  = 0;
+
+let aiIdleJitterPhase      = 0;
 
 
 

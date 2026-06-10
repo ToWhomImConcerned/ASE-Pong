@@ -36,6 +36,20 @@ function loop() {
 }
 
 // ================================================================
+//  RUNTIME ROUTING — reads ?score= URL param
+// ================================================================
+
+function readRuntime() {
+  const params = new URLSearchParams(window.location.search);
+
+  // Apply match length — default to 11 if param absent or invalid
+  const scoreParam = parseInt(params.get('score'), 10);
+  if ([3, 5, 7, 9].includes(scoreParam)) {
+    CONFIG.MAX_SCORE = scoreParam;
+  }
+}
+
+// ================================================================
 //  MODE ROUTING
 // ================================================================
 
@@ -66,6 +80,7 @@ exitButton.addEventListener('click', e => {
 // ================================================================
 
 function init() {
+  readRuntime();
   applyAdaptiveProfile();
 
   document.getElementById('hud-match-length').textContent = '// FIRST TO ' + CONFIG.MAX_SCORE + ' \\\\';

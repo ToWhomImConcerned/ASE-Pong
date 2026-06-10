@@ -213,7 +213,7 @@ initToggle('toggle-paddle-shatter',       'paddleShatter',       applyToggle);
 const DEFAULTS = {
   playerName:          'USR',
   playerColor:         '#001aff',
-  ballColor:           '#e8e8e8',
+  ballColor:           '#ffffff',
   ballShape:           'square',
   ballTrail:           true,
   ballSpin:            true,

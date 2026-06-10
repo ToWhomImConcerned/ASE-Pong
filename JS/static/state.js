@@ -149,7 +149,7 @@ let diff = null;
 const settings = {
   playerName:          'USR',     // display name — max 3 chars
   playerColor:         '#001aff',    // CSS hex — also synced to --color-player
-  ballColor:           '#e8e8e8',    // actual ball core color
+  ballColor:           '#ffffff',    // actual ball core color
   ballShape:           'square',     // 'square' | 'circle' | 'triangle'
   ballTrail:           true,
   ballSpin:            true,

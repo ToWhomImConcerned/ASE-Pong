@@ -9,10 +9,10 @@
 const Q_ACTIONS = ['move_up', 'move_down', 'hold'];
 const Q_ACTION_BIAS = { move_up: -18, move_down: 18, hold: 0 };
 
-const BEHAVIOR_START = { reactionDelay: 180, missRate: 0.38, predictionNoise: 48 };
+const BEHAVIOR_START = { reactionDelay: 135, missRate: 0.28, predictionNoise: 38 };
 const BEHAVIOR_END   = { reactionDelay: 0,   missRate: 0,    predictionNoise: 10 };
 const EVOLUTION_TARGET_ROUNDS = 40;
-const PLAYER_HIT_BEHAVIOR_STEP = 0.03;
+const PLAYER_HIT_BEHAVIOR_STEP = 0.04;
 
 
 // ================================================================
@@ -40,6 +40,7 @@ function aiUpdate() {
     aiMissRolled        = false;
     aiTrajectoryCommitY = null;
     aiRecomputeTimer    = 0;
+    aiFirstIncomingServe = false;
   }
 
   const canReact = ball.vx <= 0 ||
@@ -60,7 +61,7 @@ function aiUpdate() {
 
   if (aiSmoothedTarget === null) aiSmoothedTarget = rawTargetY;
 
-  const smoothRate = lerp(0.085, 0.028, prog);
+  const smoothRate = lerp(0.085, 0.045, prog);
   aiSmoothedTarget += (rawTargetY - aiSmoothedTarget) * smoothRate;
 
   const qState  = encodeQState();
@@ -69,14 +70,21 @@ function aiUpdate() {
   aiLastQAction = qAction;
 
   const biasTarget = Q_ACTION_BIAS[qAction] * prog * 0.22;
-  aiBiasSmoothed += (biasTarget - aiBiasSmoothed) * 0.04;
+  aiBiasSmoothed += (biasTarget - aiBiasSmoothed) * 0.08;
 
-  ai.targetY = aiSmoothedTarget - ai.h / 2 + aiBiasSmoothed;
+  const trackingGap = Math.abs((aiSmoothedTarget - ai.h / 2 + aiBiasSmoothed) - ai.y);
+  const idleOrStill = ball.vx <= 0 || trackingGap < 4 || Math.abs(ball.vy) < 0.35;
+  aiIdleJitterPhase += 0.055 + prog * 0.025;
+  const idleJitter = idleOrStill
+    ? (Math.sin(aiIdleJitterPhase) * 1.6 + Math.sin(aiIdleJitterPhase * 0.37) * 0.9) * (1 - prog * 0.35)
+    : 0;
+
+  ai.targetY = aiSmoothedTarget - ai.h / 2 + aiBiasSmoothed + idleJitter;
 
   const gap = ai.targetY - ai.y;
   if (Math.abs(gap) > 0.5) {
-    const reactionSpeed = lerp(0.28, 0.34, prog);
-    const maxSpeed      = lerp(2.6, 7.8, prog);
+    const reactionSpeed = lerp(0.24, 0.32, prog);
+    const maxSpeed      = lerp(3.2, 8.2, prog);
     let dy = gap * reactionSpeed;
     dy = Math.sign(dy) * Math.min(Math.abs(dy), maxSpeed);
     ai.y += dy;
@@ -95,14 +103,23 @@ function incomingTargetForProgress(prog) {
 
     const initChase = state.ball.y;
     let intercept   = predictBallYToX(state.ai.x, Math.round(lerp(3, 8, prog)));
-    intercept += (Math.random() * 2 - 1) * aiMemory.behavior.predictionNoise;
+    
+    if (!aiFirstIncomingServe) {
+      intercept += (Math.random() * 2 - 1) * aiMemory.behavior.predictionNoise;
+    }
     intercept += patternTargetBias();
 
     const blend = Math.min(1, prog / 0.42);
     let y = initChase + (intercept - initChase) * blend;
 
-    if (aiForcedMiss) {
-      y += (Math.random() < 0.5 ? -1 : 1) * lerp(100, 30, prog) * (0.6 + Math.random() * 0.4);
+    if (aiForcedMiss && !aiFirstIncomingServe) {
+      const missDirection = Math.random() < 0.5 ? -1 : 1;
+      const missOffset = lerp(100, 30, prog) * (0.6 + Math.random() * 0.4);
+      const missTarget = missDirection * missOffset;
+      aiForcedMissSmoothed += (missTarget - aiForcedMissSmoothed) * 0.15;
+      y += aiForcedMissSmoothed;
+    } else {
+      aiForcedMissSmoothed += (0 - aiForcedMissSmoothed) * 0.15;
     }
 
     aiTrajectoryCommitY = clampY(y);
@@ -123,13 +140,16 @@ function updateBehaviorLearning() {
 }
 
 function applyBehaviorStep(scale) {
+  const progress = aiEvolutionProgress();
+  const learningCurve = lerp(1.85, 0.45, Math.pow(progress, 1.35));
+  const effectiveScale = scale * learningCurve;
   const b = aiMemory.behavior;
   b.reactionDelay   = Math.max(BEHAVIOR_END.reactionDelay,
-    b.reactionDelay   - ((BEHAVIOR_START.reactionDelay - BEHAVIOR_END.reactionDelay) / EVOLUTION_TARGET_ROUNDS) * scale);
+    b.reactionDelay   - ((BEHAVIOR_START.reactionDelay - BEHAVIOR_END.reactionDelay) / EVOLUTION_TARGET_ROUNDS) * effectiveScale);
   b.missRate        = Math.max(BEHAVIOR_END.missRate,
-    b.missRate        - ((BEHAVIOR_START.missRate - BEHAVIOR_END.missRate) / EVOLUTION_TARGET_ROUNDS) * scale);
+    b.missRate        - ((BEHAVIOR_START.missRate - BEHAVIOR_END.missRate) / EVOLUTION_TARGET_ROUNDS) * effectiveScale);
   b.predictionNoise = Math.max(BEHAVIOR_END.predictionNoise,
-    b.predictionNoise - ((BEHAVIOR_START.predictionNoise - BEHAVIOR_END.predictionNoise) / EVOLUTION_TARGET_ROUNDS) * scale);
+    b.predictionNoise - ((BEHAVIOR_START.predictionNoise - BEHAVIOR_END.predictionNoise) / EVOLUTION_TARGET_ROUNDS) * effectiveScale);
 }
 
 
@@ -145,6 +165,10 @@ function aiObserveLaunch() {
   aiMemory.sessionStats.playerServeZones[zone]++;
 }
 
+function aiObserveLaunchDirection() {
+  aiFirstIncomingServe = state.ball.vx > 0;
+}
+
 function aiObservePaddleHit(who, hitPos, incomingAngle) {
   const H = CONFIG.TARGET_HEIGHT;
 
@@ -158,6 +182,8 @@ function aiObservePaddleHit(who, hitPos, incomingAngle) {
     else aiMemory.sessionStats.straightCount++;
 
     applyBehaviorStep(PLAYER_HIT_BEHAVIOR_STEP);
+  } else if (who === 'ai') {
+    aiFirstIncomingServe = false;
   }
 }
 
@@ -255,6 +281,8 @@ function aiObserveRallyEnd(scorer) {
   aiMissRolled          = false;
   aiTrajectoryCommitY   = null;
   aiRecomputeTimer      = 0;
+  aiForcedMissSmoothed  = 0;
+  aiFirstIncomingServe  = false;
 }
 
 
@@ -386,8 +414,8 @@ const THREAT_MSGS = {
   mid: [
     'ANTICIPATING...',
     'ABSORBNG...',
-    'CATALOGING...',
-    'PROCESSING',
+    'CATALOGUING...',
+    'PROCESSING...',
     'RECALC\u2591\u2591\u2591ULATING...',
     'CONVRGENCE: 58%',
     'CONVERGENCE: 64%',
@@ -408,7 +436,7 @@ const THREAT_MSGS = {
   ],
   late: [
     'CONVERGENCE: COMPLETE',
-    'MODL//:REFIND',
+    'MODL//:\u2591\u2591REFIN\u2591D',
     'LOSS MINIMIZED',
     'BEHAVIORAL DELTA-- OVRCLO-',
     'ANOMALY DETEC-',
@@ -444,6 +472,8 @@ let threatWrapEl   = null;
 let threatSizerEl  = null;
 let threatMsgAEl   = null;
 let threatMsgBEl   = null;
+
+let aiFirstIncomingServe = false;
 
 function threatTier() {
   const p = aiEvolutionProgress();
