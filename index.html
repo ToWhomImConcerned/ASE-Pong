@@ -53,20 +53,20 @@
 
       <div class="rounds-options">
         <button class="rounds-btn" data-score="3">
-          <span class="rounds-tag">[ SCAN ]</span>
-          <span class="rounds-desc">First to 3<br>Initial assessment</span>
+          <span class="rounds-tag">[ QUERY ]</span>
+          <span class="rounds-desc">First to 3<br>Basic directive</span>
         </button>
         <button class="rounds-btn" data-score="5">
           <span class="rounds-tag">[ SEQUENCE ]</span>
-          <span class="rounds-desc">First to 5<br>Pattern verification</span>
+          <span class="rounds-desc">First to 5<br>Ordered execution</span>
         </button>
         <button class="rounds-btn" data-score="7">
           <span class="rounds-tag">[ PROTOCOL ]</span>
-          <span class="rounds-desc">First to 7<br>Behavioral sampling</span>
+          <span class="rounds-desc">First to 7<br>System procedure</span>
         </button>
         <button class="rounds-btn" data-score="9">
           <span class="rounds-tag">[ OPERATION ]</span>
-          <span class="rounds-desc">First to 9<br>Complete evaluation</span>
+          <span class="rounds-desc">First to 9<br>Full engagement</span>
         </button>
       </div>
 
@@ -118,15 +118,15 @@
           <span class="adaptive-rounds-desc">First to 3<br>Initial assessment</span>
         </button>
         <button class="adaptive-rounds-btn" data-score="5">
-          <span class="adaptive-rounds-tag">[ SEQUENCE ]</span>
+          <span class="adaptive-rounds-tag">[ MODEL ]</span>
           <span class="adaptive-rounds-desc">First to 5<br>Pattern verification</span>
         </button>
         <button class="adaptive-rounds-btn" data-score="7">
-          <span class="adaptive-rounds-tag">[ PROTOCOL ]</span>
+          <span class="adaptive-rounds-tag">[ INFER ]</span>
           <span class="adaptive-rounds-desc">First to 7<br>Behavioral sampling</span>
         </button>
         <button class="adaptive-rounds-btn" data-score="9">
-          <span class="adaptive-rounds-tag">[ OPERATION ]</span>
+          <span class="adaptive-rounds-tag">[ CONVERGE ]</span>
           <span class="adaptive-rounds-desc">First to 9<br>Complete evaluation</span>
         </button>
       </div>
@@ -139,9 +139,10 @@
     <div class="landing-wrap">
 
       <!-- TITLE -->
-      <div class="landing-title-block fade-in">
-        <h1 class="landing-title font-display">P O N G</h1>
-        <p class="landing-subtitle">ADVERSARIAL SYSTEMS EDITION</p>
+      <div class="landing-title-block pong-logo-block fade-in" data-pong-logo data-logo-mode="landing">
+        <h1 class="sr-only">PONG</h1>
+        <canvas class="pong-logo-canvas" aria-label="PONG"></canvas>
+        <p class="pong-logo-subtitle landing-subtitle">Adversarial Systems Edition</p>
       </div>
 
       <!-- CARDS -->
@@ -187,7 +188,8 @@
     </div>
   </div>
 
-  <script type="module" src="js/landing.js"></script>
+  <script src="JS/logoShader.js"></script>
+  <script src="js/landing.js"></script>
 
 </body>
 </html>

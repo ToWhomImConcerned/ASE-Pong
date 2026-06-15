@@ -155,6 +155,43 @@ html {
 }
 
 
+/* ---- SHARED PONG SCAN LOGO ------------------------------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.pong-logo-block {
+  width: min(86vw, 560px);
+  text-align: center;
+}
+
+.pong-logo-canvas {
+  display: block;
+  width: 100%;
+  height: clamp(86px, 14vw, 122px);
+  pointer-events: none;
+}
+
+.pong-logo-subtitle {
+  font-size: 14px;
+  letter-spacing: 5px;
+  color: var(--color-text-muted);
+  text-align: center;
+  text-transform: none;
+  opacity: 0.62;
+  margin-top: -8px;
+}
+
+
 /* ---- SCROLLBAR ------------------------------------------- */
 
 ::-webkit-scrollbar { width: 4px; }

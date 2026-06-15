@@ -162,9 +162,10 @@
   <div class="page-content">
 
     <!-- TITLE -->
-    <div class="game-title-block">
-      <h1 class="game-title font-display">P O N G</h1>
-      <p class="game-subtitle">ADAPTIVE ANALYSIS EDITION</p>
+    <div class="game-title-block pong-logo-block" data-pong-logo data-logo-mode="adaptive">
+      <h1 class="sr-only">PONG</h1>
+      <canvas class="pong-logo-canvas" aria-label="PONG"></canvas>
+      <p class="pong-logo-subtitle game-subtitle">Adversarial Systems Edition</p>
     </div>
 
     <!-- Canvas -->
@@ -214,5 +215,6 @@
   <script src="JS/adaptive/render.js"></script>
   <script src="JS/adaptive/game.js"></script>
   <script src="JS/adaptive/settings.js"></script>
+  <script src="JS/logoShader.js"></script>
 </body>
 </html>

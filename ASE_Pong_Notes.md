@@ -39,7 +39,7 @@ double-paddle-pong, 2 paddles per side
 3D pong
 
 
-***SETTINGS***
+***SETTINGS*** (DONE)
 ball shape (square, ball, triangle for now) (updates trail shape, currently cubes getting smaller and smaller, should always match ball shape)
 ball color (actual ball, not the trail)
 player color (paddles, player hud name and score flash, ready overlay shadow, right side goal pulse, player paddle pulse, player ball trail, player color particles)
@@ -48,7 +48,7 @@ goal pulse (on/off)
 ball spin (on/off)
 particles (on/off)
 
-*ready overlay*
+*ready overlay* (DONE)
 left click and space both start the game
 change countdown to 3 2 1 / currently 3 2 1 0
 if space is used to start the game, keyboard controls and regular mouse movement as normal
@@ -70,10 +70,10 @@ find suitable background animation
 add goal pulse effects (done)
 adjust hud score flash to match goal pulse colors accordingly (done)
 make JUST experimental game mode card (pink/purple)
-slow down pointer lock sensitivity
+slow down pointer lock sensitivity (DONE)
 remove/replace current base background
 add settings menu using DOM overlay (done)
-add "player name" setting with a type box
+add "player name" setting with a type box (DONE)
 
 *goal pulse* (done)
 player goal (left) pulses ai difficulty color (diffColor1) when goal is scored
@@ -83,11 +83,11 @@ pulse effect has higher opacity towards the canvas edge, and fades as the color 
 pulses should be a fluid motion radiating out from one side of the screen and back depending on which goal is scored on
 pulse should look like a gradient coming from one side of the canvas of the corresponding color depending on who scores and on what difficulty
 
-*canvas bg*
+*canvas bg* (DONE)
 very subtle hues on game canvas edges (blue left) (diffColor1 right)
 very subtle moving particle effect inside game canvas
 
-*boot sequence*
+*boot sequence* (DONE)
 starts relatively contained/full words, readable code, activating.
 progressively becomes less contained and breaking in structure / broken syntax, abbreviated words, more errors and threatening colors, feels like the machine is overwriting the system
 the dark oranges and browns are ugly, more neon, attention grabbing colors would work better
@@ -97,7 +97,7 @@ a good amount of errors and failures at the end, a short pause, and an uncanny l
 the colors need to be organized, should replace diffColor2 with a library of all adaptive colors used in the landing page game card, boot sequence, and actual game page later on
 keep "EXECUTE..." as initialization button
 
-*paddle shatter animation*
+*paddle shatter animation* (DONE)
 0 gravity feel, matching all other animations
 shards evenly split across directions
 feels like a delayed pulse
@@ -117,8 +117,8 @@ redo landing page game mode cards, revisit fluid border animations
 
 scan animation for pong landing page label
 
-Change ball rotation to spin clockwise when moving to the right and counter-clockwise when moving to the left. Player paddle hit instantly changes rotation to clockwise and AI paddle hit instantly changes rotation to counter-clockwise. Same rules apply for initialization of a round before either paddle touches the ball. Moving right = clockwise. Moving left = counter-clockwise.
+Change ball rotation to spin clockwise when moving to the right and counter-clockwise when moving to the left. Player paddle hit instantly changes rotation to clockwise and AI paddle hit instantly changes rotation to counter-clockwise. Same rules apply for initialization of a round before either paddle touches the ball. Moving right = clockwise. Moving left = counter-clockwise. (DONE)
 
-On initialization of a round, the ball trail should ALWAYS be white before touching a paddle. The rule is if the ball hasn't touched a paddle yet, the ball trail is white.
+On initialization of a round, the ball trail should ALWAYS be white before touching a paddle. The rule is if the ball hasn't touched a paddle yet, the ball trail is white. (DONE)
 
 BE PROUD OF YOURSELF! C: <3

@@ -27,20 +27,11 @@
   opacity: 0.08;
 }
 
-.landing-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(36px, 6vw, 72px);
-  font-weight: 900;
-  letter-spacing: 16px;
-  color: var(--color-text-primary);
-  text-transform: uppercase;
-}
-
 .landing-subtitle {
   font-size: 14px;
   letter-spacing: 5px;
   color: var(--color-text-muted);
-  text-transform: uppercase;
+  text-transform: none;
   margin-top: 2px;
 }
 
@@ -510,6 +501,11 @@
 .diff-stable    .diff-tag { color: #ffdd00; }
 .diff-prime     .diff-tag { color: #ff8800; }
 .diff-overclock .diff-tag { color: #ff2200; }
+
+.diff-init:hover      .diff-tag { text-shadow: 0 0 12px #00ff0d; }
+.diff-stable:hover    .diff-tag { text-shadow: 0 0 12px #ffdd00; }
+.diff-prime:hover     .diff-tag { text-shadow: 0 0 12px #ff8800; }
+.diff-overclock:hover .diff-tag { text-shadow: 0 0 12px #ff2200; }
 
 .diff-desc {
   font-size: 13px;
@@ -1004,4 +1000,3 @@
   color: var(--color-text-muted);
   letter-spacing: 1px;
 }
-

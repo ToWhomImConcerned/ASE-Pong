@@ -48,25 +48,11 @@
   flex-shrink: 0;
 }
 
-.game-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: clamp(36px, 6vw, 72px);
-  font-weight: 900;
-  letter-spacing: 16px;
-  color: var(--color-text-primary);
-  text-shadow: 0 0 12px var(--color-classic-primary);
-  text-transform: uppercase;
-}
-
-.adaptive-game .game-title {
-  text-shadow: 0 0 12px var(--color-adaptive-primary);
-}
-
 .game-subtitle {
   font-size: 14px;
   letter-spacing: 5px;
   color: var(--color-text-muted);
-  text-transform: uppercase;
+  text-transform: none;
   margin-top: 2px;
 }
 
